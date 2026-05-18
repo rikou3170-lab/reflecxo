@@ -368,6 +368,10 @@ const CAB = {
   legal: "Dispensé(e) d'immatriculation au RCS et au RM"
 };
 const TABS = [{
+  id: "planning",
+  label: "Planning",
+  icon: "📅"
+}, {
   id: "invoices",
   label: "Factures",
   icon: "❋"
@@ -412,6 +416,26 @@ function fmtEuro(n) {
     style: "currency",
     currency: "EUR"
   }).format(n);
+}
+
+function parseBirthday(s) {
+  // Accepte JJ/MM/AAAA, JJ-MM-AAAA, JJ.MM.AAAA ou YYYY-MM-DD
+  if (!s) return null;
+  var t = s.trim();
+  var m = t.match(/^(\d{1,2})[\/\-\.](\d{1,2})[\/\-\.](\d{2,4})$/);
+  if (m) {
+    var day = parseInt(m[1],10);
+    var month = parseInt(m[2],10) - 1;
+    var year = parseInt(m[3],10);
+    if (year < 100) year += 1900;
+    if (month < 0 || month > 11 || day < 1 || day > 31) return null;
+    return {day: day, month: month, year: year};
+  }
+  var m2 = t.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+  if (m2) {
+    return {day: parseInt(m2[3],10), month: parseInt(m2[2],10)-1, year: parseInt(m2[1],10)};
+  }
+  return null;
 }
 
 // ─── FIRESTORE CRUD ───
@@ -577,7 +601,8 @@ function doPrint(inv) {
 
 function Dashboard({
   invoices,
-  clients
+  clients,
+  services
 }) {
   var now = new Date();
   const [selectedYear, setSelectedYear] = useState(now.getFullYear());
@@ -690,17 +715,28 @@ function Dashboard({
   var topSvc = {};
   invoices.forEach(function (inv) {
     (inv.items || []).forEach(function (it) {
-      topSvc[it.name] = (topSvc[it.name] || 0) + (it.qty || 1);
+      if (!topSvc[it.name]) topSvc[it.name] = {qty: 0, ca: 0};
+      topSvc[it.name].qty += (it.qty || 1);
+      topSvc[it.name].ca += (it.price || 0) * (it.qty || 1);
     });
   });
   var topList = Object.entries(topSvc).sort(function (a, b) {
-    return b[1] - a[1];
+    return b[1].ca - a[1].ca;
   }).slice(0, 5);
+
+  var clientTotals = {};
+  invoices.forEach(function(inv){
+    if (!inv.client || !inv.client.id) return;
+    var k = inv.client.id;
+    if (!clientTotals[k]) clientTotals[k] = {name: inv.client.name + (inv.client.firstname ? " " + inv.client.firstname : ""), total: 0, count: 0};
+    clientTotals[k].total += inv.total;
+    clientTotals[k].count += 1;
+  });
+  var topClients = Object.values(clientTotals).sort(function(a,b){return b.total - a.total;}).slice(0,5);
   var currentMonth = now.getMonth();
   var birthdayClients = clients.filter(function (c) {
     if (!c.birthday) return false;
-    var bMonth = new Date(c.birthday).getMonth();
-    return bMonth === currentMonth;
+    var bMonth = parseBirthday(c.birthday); if (!bMonth) return false; return bMonth.month === currentMonth;
   });
   var bons = localGet("bons_cadeaux");
   var today = now.toISOString().slice(0, 10);
@@ -771,9 +807,9 @@ function Dashboard({
       color: "var(--gold)"
     }
   }, "\uD83C\uDF82 Anniversaires du mois"), birthdayClients.map(function (c) {
-    var bDay = new Date(c.birthday);
-    var jour = bDay.getDate();
-    var moisNom = monthNames[bDay.getMonth()];
+    var pb = parseBirthday(c.birthday) || {day:1, month:0};
+    var jour = pb.day;
+    var moisNom = monthNames[pb.month];
     return /*#__PURE__*/React.createElement("div", {
       key: c.id,
       style: {
@@ -1011,7 +1047,7 @@ function Dashboard({
     className: "card"
   }, /*#__PURE__*/React.createElement("div", {
     className: "card-title"
-  }, "Soins populaires"), topList.length === 0 ? /*#__PURE__*/React.createElement("div", {
+  }, "💰 Soins les plus rentables"), topList.length === 0 ? /*#__PURE__*/React.createElement("div", {
     className: "empty-state"
   }, /*#__PURE__*/React.createElement("p", {
     style: {
@@ -1019,18 +1055,81 @@ function Dashboard({
     }
   }, "Pas encore de donn\xE9es")) : /*#__PURE__*/React.createElement("div", {
     className: "table-wrap"
-  }, /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "Soin"), /*#__PURE__*/React.createElement("th", null, "Nb"))), /*#__PURE__*/React.createElement("tbody", null, topList.map(function (e, i) {
+  }, /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "Soin"), /*#__PURE__*/React.createElement("th", null, "Nb"), /*#__PURE__*/React.createElement("th", {style:{textAlign:"right"}}, "CA"))), /*#__PURE__*/React.createElement("tbody", null, topList.map(function (e, i) {
     return /*#__PURE__*/React.createElement("tr", {
       key: i
-    }, /*#__PURE__*/React.createElement("td", null, e[0]), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("strong", null, e[1])));
-  }))))));
+    }, /*#__PURE__*/React.createElement("td", null, e[0]), /*#__PURE__*/React.createElement("td", null, e[1].qty), /*#__PURE__*/React.createElement("td", {style:{textAlign:"right"}}, /*#__PURE__*/React.createElement("strong", null, fmtEuro(e[1].ca))));
+  }))))), /*#__PURE__*/React.createElement("div", {
+    className: "card"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "card-title"
+  }, "🏆 Top clients"), topClients.length === 0 ? /*#__PURE__*/React.createElement("div", {
+    className: "empty-state"
+  }, /*#__PURE__*/React.createElement("p", {style:{fontSize:13}}, "Pas encore de donn\xE9es")) : /*#__PURE__*/React.createElement("div", {
+    className: "table-wrap"
+  }, /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "Client(e)"), /*#__PURE__*/React.createElement("th", null, "Nb soins"), /*#__PURE__*/React.createElement("th", {style:{textAlign:"right"}}, "CA"))), /*#__PURE__*/React.createElement("tbody", null, topClients.map(function(c, i){
+    return /*#__PURE__*/React.createElement("tr", {key: i},
+      /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("strong", null, c.name)),
+      /*#__PURE__*/React.createElement("td", null, c.count),
+      /*#__PURE__*/React.createElement("td", {style:{textAlign:"right", fontWeight:700}}, fmtEuro(c.total))
+    );
+  }))))), /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {textAlign: "center"}
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "card-title"
+  }, "💾 Sauvegarde"), /*#__PURE__*/React.createElement("p", {
+    style: {fontSize: 12, color: "var(--text-lt)", marginBottom: 14}
+  }, "Téléchargez une copie complète de vos données"), /*#__PURE__*/React.createElement("div", {
+    style: {display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "center"}
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-secondary",
+    onClick: function() {
+      var data = {
+        clients: clients,
+        invoices: invoices,
+        services: services,
+        bons_cadeaux: localGet("bons_cadeaux"),
+        exported_at: new Date().toISOString()
+      };
+      var blob = new Blob([JSON.stringify(data, null, 2)], {type: "application/json"});
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url;
+      a.download = "gina-backup-" + new Date().toISOString().slice(0,10) + ".json";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  }, "💾 Sauvegarde JSON"), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-secondary",
+    onClick: function() {
+      var yearInv = invoices.filter(function(i){ return new Date(i.date).getFullYear() === selectedYear; });
+      var rows = [["Date","N° Facture","Client","Soins","Montant (€)","Mode paiement","Statut"]];
+      yearInv.forEach(function(inv){
+        var soins = (inv.items||[]).map(function(it){return it.name+(it.qty>1?" x"+it.qty:"");}).join(" + ");
+        var clientNom = inv.client ? inv.client.name + (inv.client.firstname ? " " + inv.client.firstname : "") : "";
+        rows.push([fmtDate(inv.date), inv.number, clientNom, soins, inv.total.toFixed(2).replace(".", ","), inv.payMethod||"", inv.paid?"Payée":"En attente"]);
+      });
+      var csv = rows.map(function(r){return r.map(function(c){var s=String(c); return s.indexOf(";")>=0||s.indexOf('"')>=0||s.indexOf("\n")>=0 ? '"'+s.replace(/"/g,'""')+'"' : s;}).join(";");}).join("\n");
+      var BOM = "\uFEFF";
+      var blob = new Blob([BOM + csv], {type: "text/csv;charset=utf-8"});
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url;
+      a.download = "factures-" + selectedYear + ".csv";
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  }, "📊 Export comptable CSV"))));
 }
 function ClientsPage({
   clients,
-  setClients
+  setClients,
+  invoices
 }) {
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState(null);
+  const [historyClient, setHistoryClient] = useState(null);
   const [form, setForm] = useState({
     name: "",
     firstname: "",
@@ -1139,13 +1238,20 @@ function ClientsPage({
       onClick: function () {
         openEdit(c);
       }
-    }, /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("strong", null, c.name)), /*#__PURE__*/React.createElement("td", null, c.firstname || "—"), /*#__PURE__*/React.createElement("td", null, c.phone || "—"), /*#__PURE__*/React.createElement("td", null, c.email || "—"), /*#__PURE__*/React.createElement("td", null, c.address || "—"), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("button", {
+    }, /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("strong", null, c.name)), /*#__PURE__*/React.createElement("td", null, c.firstname || "—"), /*#__PURE__*/React.createElement("td", null, c.phone || "—"), /*#__PURE__*/React.createElement("td", null, c.email || "—"), /*#__PURE__*/React.createElement("td", null, c.address || "—"), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("div", {style:{display:"flex", gap:6, justifyContent:"flex-end"}}, /*#__PURE__*/React.createElement("button", {
+      className: "btn btn-secondary btn-sm",
+      title: "Historique des soins",
+      onClick: function (e) {
+        e.stopPropagation();
+        setHistoryClient(c);
+      }
+    }, "\u{1F4CB}"), /*#__PURE__*/React.createElement("button", {
       className: "btn btn-danger btn-sm",
       onClick: function (e) {
         e.stopPropagation();
         handleDelete(c.id);
       }
-    }, "\u2715")));
+    }, "\u2715"))));
   }))))), showModal && /*#__PURE__*/React.createElement("div", {
     className: "modal-overlay",
     onClick: function () {
@@ -1238,11 +1344,18 @@ function ClientsPage({
     className: "form-label"
   }, "Date de naissance"), /*#__PURE__*/React.createElement("input", {
     className: "form-input",
-    type: "date",
+    type: "text",
+    placeholder: "JJ/MM/AAAA",
+    inputMode: "numeric",
+    maxLength: 10,
     value: form.birthday,
     onChange: function (e) {
+      var v = e.target.value.replace(/\D/g, "").slice(0, 8);
+      var formatted = v;
+      if (v.length > 4) formatted = v.slice(0,2) + "/" + v.slice(2,4) + "/" + v.slice(4);
+      else if (v.length > 2) formatted = v.slice(0,2) + "/" + v.slice(2);
       setForm(Object.assign({}, form, {
-        birthday: e.target.value
+        birthday: formatted
       }));
     }
   })), /*#__PURE__*/React.createElement("div", {
@@ -1282,7 +1395,43 @@ function ClientsPage({
   }, "Annuler"), /*#__PURE__*/React.createElement("button", {
     className: "btn btn-primary",
     onClick: handleSave
-  }, "Enregistrer")))));
+  }, "Enregistrer"))))), historyClient && /*#__PURE__*/React.createElement("div", {
+    className: "modal-overlay",
+    onClick: function() { setHistoryClient(null); }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "modal",
+    onClick: function(e) { e.stopPropagation(); }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "modal-header"
+  }, /*#__PURE__*/React.createElement("h3", null, "Historique : ", historyClient.name, historyClient.firstname ? " " + historyClient.firstname : ""), /*#__PURE__*/React.createElement("button", {
+    className: "modal-close",
+    onClick: function() { setHistoryClient(null); }
+  }, "\u2715")), /*#__PURE__*/React.createElement("div", {
+    className: "modal-body"
+  }, (function(){
+    var clientInvs = (invoices||[]).filter(function(i){ return i.client && i.client.id === historyClient.id; });
+    if (clientInvs.length === 0) return /*#__PURE__*/React.createElement("div", {
+      className: "empty-state"
+    }, /*#__PURE__*/React.createElement("div", {className:"empty-icon"}, "\u270F"), /*#__PURE__*/React.createElement("p", null, "Aucun soin pour ce client"));
+    var totalClient = clientInvs.reduce(function(s,i){return s+i.total;},0);
+    var nbSoins = clientInvs.reduce(function(s,i){return s+(i.items||[]).reduce(function(ss,it){return ss+(it.qty||1);},0);},0);
+    return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+      style: {display:"flex", gap:12, marginBottom:16}
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {flex:1, padding:14, background:"var(--lav-bg)", borderRadius:12, textAlign:"center"}
+    }, /*#__PURE__*/React.createElement("div", {style:{fontSize:11, color:"var(--text-lt)", fontWeight:700, textTransform:"uppercase", letterSpacing:".06em"}}, "Total d\xE9pens\xE9"), /*#__PURE__*/React.createElement("div", {style:{fontFamily:"'Cormorant Garamond',serif", fontSize:22, fontWeight:700, color:"var(--lav-dk)"}}, fmtEuro(totalClient))), /*#__PURE__*/React.createElement("div", {
+      style: {flex:1, padding:14, background:"var(--lav-bg)", borderRadius:12, textAlign:"center"}
+    }, /*#__PURE__*/React.createElement("div", {style:{fontSize:11, color:"var(--text-lt)", fontWeight:700, textTransform:"uppercase", letterSpacing:".06em"}}, "Nb soins"), /*#__PURE__*/React.createElement("div", {style:{fontFamily:"'Cormorant Garamond',serif", fontSize:22, fontWeight:700, color:"var(--lav-dk)"}}, nbSoins))), /*#__PURE__*/React.createElement("div", {
+      className: "table-wrap"
+    }, /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "Date"), /*#__PURE__*/React.createElement("th", null, "N\xB0"), /*#__PURE__*/React.createElement("th", null, "Soins"), /*#__PURE__*/React.createElement("th", {style:{textAlign:"right"}}, "Montant"))), /*#__PURE__*/React.createElement("tbody", null, clientInvs.map(function(inv){
+      return /*#__PURE__*/React.createElement("tr", {key: inv.id},
+        /*#__PURE__*/React.createElement("td", null, fmtDate(inv.date)),
+        /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("strong", null, inv.number)),
+        /*#__PURE__*/React.createElement("td", null, (inv.items||[]).map(function(it){return it.name+(it.qty>1?" x"+it.qty:"");}).join(", ")),
+        /*#__PURE__*/React.createElement("td", {style:{textAlign:"right", fontWeight:700}}, fmtEuro(inv.total))
+      );
+    })))));
+  })())));
 }
 function ServicesPage({
   services,
@@ -2336,6 +2485,7 @@ function BonCadeauPage({
   const [dureeValidite, setDureeValidite] = useState(3);
   const [payMethod, setPayMethod] = useState("Espèces");
   const [factureCreee, setFactureCreee] = useState(null);
+  const [bonsList, setBonsList] = useState(localGet("bons_cadeaux"));
   var dateObj = new Date(dateDebut);
   var dateFin = new Date(dateObj);
   dateFin.setMonth(dateFin.getMonth() + dureeValidite);
@@ -2415,7 +2565,31 @@ function BonCadeauPage({
       factureNum: invData.number
     });
     localSet("bons_cadeaux", bons);
+    setBonsList(bons);
     setFactureCreee(newInv);
+  };
+
+  var toggleBonUtilise = function(bonId) {
+    var bons = localGet("bons_cadeaux").map(function(b){
+      if (b.id === bonId) return Object.assign({}, b, {utilise: !b.utilise, dateUtilisation: !b.utilise ? new Date().toISOString().slice(0,10) : null});
+      return b;
+    });
+    localSet("bons_cadeaux", bons);
+    setBonsList(bons);
+  };
+
+  var deleteBon = function(bonId) {
+    if (!confirm("Supprimer ce bon cadeau de la liste ?")) return;
+    var bons = localGet("bons_cadeaux").filter(function(b){ return b.id !== bonId; });
+    localSet("bons_cadeaux", bons);
+    setBonsList(bons);
+  };
+
+  var getBonStatus = function(b) {
+    if (b.utilise) return {label:"Utilisé", color:"#7BA07E", bg:"#EDF5EE"};
+    var today = new Date().toISOString().slice(0,10);
+    if (b.dateFin < today) return {label:"Expiré", color:"#C07B7B", bg:"#FDF2F0"};
+    return {label:"En cours", color:"#6B5A9E", bg:"#F3EFF9"};
   };
   return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     className: "page-header"
@@ -2767,8 +2941,274 @@ function BonCadeauPage({
       right: -5,
       transform: "scale(-1,-1)"
     }
-  })))));
+  })))), bonsList.length > 0 && /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {marginTop: 24}
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "card-title"
+  }, "\uD83D\uDCCB Bons cadeaux \xE9mis"), /*#__PURE__*/React.createElement("div", {
+    className: "table-wrap"
+  }, /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "B\xE9n\xE9ficiaire"), /*#__PURE__*/React.createElement("th", null, "Soin"), /*#__PURE__*/React.createElement("th", null, "Expire le"), /*#__PURE__*/React.createElement("th", null, "Statut"), /*#__PURE__*/React.createElement("th", null))), /*#__PURE__*/React.createElement("tbody", null, bonsList.slice().reverse().map(function(b) {
+    var st = getBonStatus(b);
+    return /*#__PURE__*/React.createElement("tr", {key: b.id},
+      /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("strong", null, b.beneficiaire || "—")),
+      /*#__PURE__*/React.createElement("td", null, b.soin),
+      /*#__PURE__*/React.createElement("td", null, new Date(b.dateFin).toLocaleDateString("fr-FR")),
+      /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("span", {
+        style: {display:"inline-block", padding:"4px 12px", borderRadius:20, fontSize:11, fontWeight:700, background:st.bg, color:st.color}
+      }, st.label)),
+      /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("div", {style:{display:"flex", gap:6, justifyContent:"flex-end"}},
+        !b.utilise && /*#__PURE__*/React.createElement("button", {
+          className: "btn btn-secondary btn-sm",
+          title: "Marquer comme utilis\xE9",
+          onClick: function(){ toggleBonUtilise(b.id); }
+        }, "\u2713"),
+        b.utilise && /*#__PURE__*/React.createElement("button", {
+          className: "btn btn-secondary btn-sm",
+          title: "Annuler l'utilisation",
+          onClick: function(){ toggleBonUtilise(b.id); }
+        }, "\u21BA"),
+        /*#__PURE__*/React.createElement("button", {
+          className: "btn btn-danger btn-sm",
+          title: "Supprimer",
+          onClick: function(){ deleteBon(b.id); }
+        }, "\u2715")
+      ))
+    );
+  }))))));
 }
+function PlanningPage({
+  appointments,
+  setAppointments,
+  clients,
+  setClients,
+  services,
+  invoices,
+  setInvoices,
+  setTab
+}) {
+  var now = new Date();
+  const [curMonth, setCurMonth] = useState(now.getMonth());
+  const [curYear, setCurYear] = useState(now.getFullYear());
+  const [showRdvModal, setShowRdvModal] = useState(false);
+  const [editingRdv, setEditingRdv] = useState(null);
+  const [rdvForm, setRdvForm] = useState({
+    date: "", time: "10:00", clientId: "", newClientName: "", newClientFirstname: "", serviceName: "", duration: "1h", price: 0, note: "", status: "scheduled"
+  });
+
+  var monthNames = ["Janvier","Février","Mars","Avril","Mai","Juin","Juillet","Août","Septembre","Octobre","Novembre","Décembre"];
+  var dayNames = ["Lun","Mar","Mer","Jeu","Ven","Sam","Dim"];
+
+  var firstDay = new Date(curYear, curMonth, 1);
+  var lastDay = new Date(curYear, curMonth+1, 0);
+  var startDayOfWeek = (firstDay.getDay() + 6) % 7;
+  var daysInMonth = lastDay.getDate();
+  var weeks = [];
+  var week = [];
+  for (var i=0; i<startDayOfWeek; i++) week.push(null);
+  for (var d=1; d<=daysInMonth; d++) {
+    week.push(d);
+    if (week.length === 7) { weeks.push(week); week = []; }
+  }
+  if (week.length > 0) { while(week.length < 7) week.push(null); weeks.push(week); }
+
+  var prevMonth = function(){ if(curMonth===0){setCurMonth(11);setCurYear(curYear-1);}else{setCurMonth(curMonth-1);} };
+  var nextMonth = function(){ if(curMonth===11){setCurMonth(0);setCurYear(curYear+1);}else{setCurMonth(curMonth+1);} };
+
+  var getRdvsForDay = function(day){
+    if (!day) return [];
+    var ds = curYear + "-" + String(curMonth+1).padStart(2,"0") + "-" + String(day).padStart(2,"0");
+    return appointments.filter(function(a){return a.date === ds;}).sort(function(a,b){return (a.time||"").localeCompare(b.time||"");});
+  };
+
+  var openNewRdv = function(day){
+    var ds = curYear + "-" + String(curMonth+1).padStart(2,"0") + "-" + String(day).padStart(2,"0");
+    var s = services.length > 0 ? services[0] : null;
+    setRdvForm({date: ds, time: "10:00", clientId: "", newClientName: "", newClientFirstname: "", serviceName: s ? s.name : "", duration: s ? s.duration : "1h", price: s ? s.price : 0, note: "", status: "scheduled"});
+    setEditingRdv(null);
+    setShowRdvModal(true);
+  };
+
+  var openEditRdv = function(rdv){
+    setRdvForm(Object.assign({newClientName:"", newClientFirstname:""}, rdv));
+    setEditingRdv(rdv.id);
+    setShowRdvModal(true);
+  };
+
+  var saveRdv = async function(){
+    var clientId = rdvForm.clientId;
+    var clientObj = null;
+    if (clientId === "__new__") {
+      if (!rdvForm.newClientName.trim()) return;
+      clientObj = await fbAdd("clients", {name: rdvForm.newClientName.trim(), firstname: rdvForm.newClientFirstname.trim(), phone:"", email:"", address:"", birthday:"", notes:""});
+      setClients(clients.concat([clientObj]));
+      clientId = clientObj.id;
+    } else if (clientId) {
+      clientObj = clients.find(function(c){return c.id===clientId;});
+    }
+    var data = {
+      date: rdvForm.date,
+      time: rdvForm.time,
+      clientId: clientId || "",
+      clientName: clientObj ? clientObj.name + (clientObj.firstname ? " " + clientObj.firstname : "") : "",
+      serviceName: rdvForm.serviceName,
+      duration: rdvForm.duration,
+      price: parseFloat(rdvForm.price) || 0,
+      note: rdvForm.note || "",
+      status: rdvForm.status || "scheduled"
+    };
+    if (editingRdv) {
+      await fbUpdate("appointments", editingRdv, data);
+      setAppointments(appointments.map(function(a){return a.id===editingRdv ? Object.assign({},a,data) : a;}));
+    } else {
+      var newRdv = await fbAdd("appointments", data);
+      setAppointments(appointments.concat([newRdv]));
+    }
+    setShowRdvModal(false);
+  };
+
+  var deleteRdv = async function(){
+    if (!editingRdv) return;
+    if (!confirm("Supprimer ce rendez-vous ?")) return;
+    await fbDelete("appointments", editingRdv);
+    setAppointments(appointments.filter(function(a){return a.id!==editingRdv;}));
+    setShowRdvModal(false);
+  };
+
+  var createInvoiceFromRdv = async function(){
+    if (!editingRdv) return;
+    var rdv = appointments.find(function(a){return a.id===editingRdv;});
+    if (!rdv) return;
+    if (!rdv.clientId) { alert("Renseignez un(e) client(e) avant de facturer"); return; }
+    var clientObj = clients.find(function(c){return c.id===rdv.clientId;});
+    if (!clientObj) return;
+    var invData = {
+      number: genNum(invoices),
+      date: new Date(rdv.date).toISOString(),
+      client: {id: clientObj.id, name: clientObj.name, firstname: clientObj.firstname||"", phone: clientObj.phone||"", address: clientObj.address||""},
+      items: [{name: rdv.serviceName, duration: rdv.duration, price: rdv.price, qty: 1}],
+      total: rdv.price,
+      paid: true,
+      payMethod: "Espèces",
+      note: "Rendez-vous du " + new Date(rdv.date).toLocaleDateString("fr-FR")
+    };
+    var newInv = await fbAdd("invoices", invData);
+    setInvoices([newInv].concat(invoices));
+    await fbUpdate("appointments", editingRdv, {status: "done", invoiceId: newInv.id});
+    setAppointments(appointments.map(function(a){return a.id===editingRdv ? Object.assign({},a,{status:"done", invoiceId:newInv.id}) : a;}));
+    setShowRdvModal(false);
+    alert("Facture " + invData.number + " créée !");
+  };
+
+  var today = new Date();
+  var todayStr = today.getFullYear() + "-" + String(today.getMonth()+1).padStart(2,"0") + "-" + String(today.getDate()).padStart(2,"0");
+
+  return /*#__PURE__*/React.createElement("div", null,
+    /*#__PURE__*/React.createElement("div", {className:"page-header"},
+      /*#__PURE__*/React.createElement("h2", null, "Planning"),
+      /*#__PURE__*/React.createElement("p", null, "Vos rendez-vous")
+    ),
+    /*#__PURE__*/React.createElement("div", {className:"card"},
+      /*#__PURE__*/React.createElement("div", {style:{display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:16}},
+        /*#__PURE__*/React.createElement("button", {className:"btn btn-secondary btn-sm", onClick:prevMonth}, "◀"),
+        /*#__PURE__*/React.createElement("div", {style:{fontFamily:"'Cormorant Garamond',serif", fontSize:22, fontWeight:700, fontStyle:"italic", color:"var(--lav-dk)"}}, monthNames[curMonth] + " " + curYear),
+        /*#__PURE__*/React.createElement("button", {className:"btn btn-secondary btn-sm", onClick:nextMonth}, "▶")
+      ),
+      /*#__PURE__*/React.createElement("div", {style:{display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:4, marginBottom:8}},
+        dayNames.map(function(d){return /*#__PURE__*/React.createElement("div", {key:d, style:{textAlign:"center", fontSize:11, fontWeight:700, color:"var(--text-lt)", padding:"6px 0", textTransform:"uppercase", letterSpacing:".06em"}}, d);})
+      ),
+      /*#__PURE__*/React.createElement("div", {style:{display:"grid", gridTemplateColumns:"repeat(7,1fr)", gap:4}},
+        weeks.flat().map(function(d, i){
+          if (!d) return /*#__PURE__*/React.createElement("div", {key:i, style:{minHeight:80}});
+          var ds = curYear + "-" + String(curMonth+1).padStart(2,"0") + "-" + String(d).padStart(2,"0");
+          var rdvs = getRdvsForDay(d);
+          var isToday = ds === todayStr;
+          return /*#__PURE__*/React.createElement("div", {
+            key: i,
+            onClick: function(){ openNewRdv(d); },
+            style: {minHeight:80, border: isToday?"2px solid var(--lav)":"1px solid var(--border-light)", borderRadius:8, padding:6, cursor:"pointer", background:isToday?"var(--lav-bg)":"#fff", overflow:"hidden", transition:"background .15s"}
+          },
+            /*#__PURE__*/React.createElement("div", {style:{fontSize:12, fontWeight:isToday?700:600, color:isToday?"var(--lav-dk)":"var(--text-mid)", marginBottom:4}}, d),
+            rdvs.slice(0,3).map(function(r){
+              var bg = r.status==="done" ? "#EDF5EE" : (r.status==="cancelled" ? "#FDF2F0" : "#F3EFF9");
+              var color = r.status==="done" ? "#7BA07E" : (r.status==="cancelled" ? "#C07B7B" : "#6B5A9E");
+              return /*#__PURE__*/React.createElement("div", {
+                key: r.id,
+                onClick: function(e){ e.stopPropagation(); openEditRdv(r); },
+                style: {fontSize:10, padding:"2px 6px", background:bg, color:color, borderRadius:6, marginBottom:2, fontWeight:600, whiteSpace:"nowrap", overflow:"hidden", textOverflow:"ellipsis"}
+              }, r.time + " " + (r.clientName||"—"));
+            }),
+            rdvs.length > 3 && /*#__PURE__*/React.createElement("div", {style:{fontSize:10, color:"var(--text-lt)", fontWeight:600}}, "+", rdvs.length-3, " autre(s)")
+          );
+        })
+      )
+    ),
+    showRdvModal && /*#__PURE__*/React.createElement("div", {className:"modal-overlay", onClick:function(){setShowRdvModal(false);}},
+      /*#__PURE__*/React.createElement("div", {className:"modal", onClick:function(e){e.stopPropagation();}},
+        /*#__PURE__*/React.createElement("div", {className:"modal-header"},
+          /*#__PURE__*/React.createElement("h3", null, editingRdv ? "Modifier le rendez-vous" : "Nouveau rendez-vous"),
+          /*#__PURE__*/React.createElement("button", {className:"modal-close", onClick:function(){setShowRdvModal(false);}}, "\u2715")
+        ),
+        /*#__PURE__*/React.createElement("div", {className:"modal-body"},
+          /*#__PURE__*/React.createElement("div", {style:{display:"flex", gap:12}},
+            /*#__PURE__*/React.createElement("div", {className:"form-group", style:{flex:2}},
+              /*#__PURE__*/React.createElement("label", {className:"form-label"}, "Date"),
+              /*#__PURE__*/React.createElement("input", {className:"form-input", type:"date", value:rdvForm.date, onChange:function(e){setRdvForm(Object.assign({},rdvForm,{date:e.target.value}));}})
+            ),
+            /*#__PURE__*/React.createElement("div", {className:"form-group", style:{flex:1}},
+              /*#__PURE__*/React.createElement("label", {className:"form-label"}, "Heure"),
+              /*#__PURE__*/React.createElement("input", {className:"form-input", type:"time", value:rdvForm.time, onChange:function(e){setRdvForm(Object.assign({},rdvForm,{time:e.target.value}));}})
+            )
+          ),
+          /*#__PURE__*/React.createElement("div", {className:"form-group"},
+            /*#__PURE__*/React.createElement("label", {className:"form-label"}, "Client(e)"),
+            /*#__PURE__*/React.createElement("select", {className:"form-select", value:rdvForm.clientId, onChange:function(e){setRdvForm(Object.assign({},rdvForm,{clientId:e.target.value}));}},
+              /*#__PURE__*/React.createElement("option", {value:""}, "— Choisir —"),
+              clients.map(function(c){return /*#__PURE__*/React.createElement("option", {key:c.id, value:c.id}, c.name + (c.firstname ? " " + c.firstname : ""));}),
+              /*#__PURE__*/React.createElement("option", {value:"__new__"}, "+ Nouveau client")
+            )
+          ),
+          rdvForm.clientId === "__new__" && /*#__PURE__*/React.createElement("div", {style:{display:"flex", gap:12}},
+            /*#__PURE__*/React.createElement("div", {className:"form-group", style:{flex:1}},
+              /*#__PURE__*/React.createElement("label", {className:"form-label"}, "Nom *"),
+              /*#__PURE__*/React.createElement("input", {className:"form-input", value:rdvForm.newClientName, onChange:function(e){setRdvForm(Object.assign({},rdvForm,{newClientName:e.target.value}));}})
+            ),
+            /*#__PURE__*/React.createElement("div", {className:"form-group", style:{flex:1}},
+              /*#__PURE__*/React.createElement("label", {className:"form-label"}, "Prénom"),
+              /*#__PURE__*/React.createElement("input", {className:"form-input", value:rdvForm.newClientFirstname, onChange:function(e){setRdvForm(Object.assign({},rdvForm,{newClientFirstname:e.target.value}));}})
+            )
+          ),
+          /*#__PURE__*/React.createElement("div", {className:"form-group"},
+            /*#__PURE__*/React.createElement("label", {className:"form-label"}, "Soin"),
+            /*#__PURE__*/React.createElement("select", {className:"form-select", value:rdvForm.serviceName, onChange:function(e){var s=services.find(function(sv){return sv.name===e.target.value;}); setRdvForm(Object.assign({},rdvForm,{serviceName:e.target.value, duration: s?s.duration:rdvForm.duration, price: s?s.price:rdvForm.price}));}},
+              services.map(function(s){return /*#__PURE__*/React.createElement("option", {key:s.id, value:s.name}, s.name + " — " + s.duration + " — " + s.price + " €");})
+            )
+          ),
+          /*#__PURE__*/React.createElement("div", {className:"form-group"},
+            /*#__PURE__*/React.createElement("label", {className:"form-label"}, "Note"),
+            /*#__PURE__*/React.createElement("textarea", {className:"form-textarea", value:rdvForm.note, onChange:function(e){setRdvForm(Object.assign({},rdvForm,{note:e.target.value}));}, placeholder:"Note pour ce RDV…"})
+          ),
+          editingRdv && /*#__PURE__*/React.createElement("div", {className:"form-group"},
+            /*#__PURE__*/React.createElement("label", {className:"form-label"}, "Statut"),
+            /*#__PURE__*/React.createElement("select", {className:"form-select", value:rdvForm.status, onChange:function(e){setRdvForm(Object.assign({},rdvForm,{status:e.target.value}));}},
+              /*#__PURE__*/React.createElement("option", {value:"scheduled"}, "Programmé"),
+              /*#__PURE__*/React.createElement("option", {value:"done"}, "Effectué"),
+              /*#__PURE__*/React.createElement("option", {value:"cancelled"}, "Annulé")
+            )
+          )
+        ),
+        /*#__PURE__*/React.createElement("div", {className:"modal-footer"},
+          editingRdv && /*#__PURE__*/React.createElement("button", {className:"btn btn-danger", onClick:deleteRdv}, "Supprimer"),
+          /*#__PURE__*/React.createElement("div", {style:{flex:1}}),
+          editingRdv && rdvForm.clientId && rdvForm.clientId !== "__new__" && rdvForm.status !== "done" && /*#__PURE__*/React.createElement("button", {className:"btn btn-secondary", onClick:createInvoiceFromRdv}, "💳 Facturer"),
+          /*#__PURE__*/React.createElement("button", {className:"btn btn-secondary", onClick:function(){setShowRdvModal(false);}}, "Annuler"),
+          /*#__PURE__*/React.createElement("button", {className:"btn btn-primary", onClick:saveRdv}, "Enregistrer")
+        )
+      )
+    )
+  );
+}
+
 function App() {
   const [authed, setAuthed] = useState(null);
   const [pin, setPin] = useState("");
@@ -2778,6 +3218,7 @@ function App() {
   const [clients, setClients] = useState([]);
   const [invoices, setInvoices] = useState([]);
   const [services, setServices] = useState([]);
+  const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [splash, setSplash] = useState(true);
@@ -2810,7 +3251,7 @@ function App() {
   // Load data only when authed
   useEffect(function () {
     if (authed !== true) return;
-    Promise.all([fbGetAll("clients"), fbGetAll("invoices"), localLoad("services", DEFAULT_SERVICES), localLoad("bons_cadeaux", [])]).then(function (res) {
+    Promise.all([fbGetAll("clients"), fbGetAll("invoices"), localLoad("services", DEFAULT_SERVICES), localLoad("bons_cadeaux", []), fbGetAll("appointments")]).then(function (res) {
       setClients(res[0]);
       var inv = res[1];
       inv.sort(function (a, b) {
@@ -2819,6 +3260,7 @@ function App() {
       setInvoices(inv);
       var svc = res[2];
       if (svc.length > 0) { setServices(svc); } else { setServices(DEFAULT_SERVICES); localSet("services", DEFAULT_SERVICES); }
+      setAppointments(res[4] || []);
       setLoading(false);
     }).catch(function (err) {
       console.error(err);
@@ -2846,7 +3288,7 @@ function App() {
       var now = new Date();
       var bdayCount = clients.filter(function (c) {
         if (!c.birthday) return false;
-        return new Date(c.birthday).getMonth() === now.getMonth();
+        var pb = parseBirthday(c.birthday); return pb && pb.month === now.getMonth();
       }).length;
       var bons = localGet("bons_cadeaux");
       var todayStr = now.toISOString().slice(0, 10);
@@ -2855,7 +3297,14 @@ function App() {
       var bonsCount = bons.filter(function (b) {
         return b.dateFin >= todayStr && b.dateFin <= dans30j.toISOString().slice(0, 10);
       }).length;
-      if (bdayCount > 0 || bonsCount > 0) {
+      var clientSoinCount = {};
+      invoices.forEach(function(inv){
+        if (!inv.client || !inv.client.id) return;
+        var n = (inv.items||[]).reduce(function(s,it){return s+(it.qty||1);},0);
+        clientSoinCount[inv.client.id] = (clientSoinCount[inv.client.id]||0) + n;
+      });
+      var fidCount = clients.filter(function(c){var n=clientSoinCount[c.id]||0; return n===8||n===9;}).length;
+      if (bdayCount > 0 || bonsCount > 0 || fidCount > 0) {
         playChime();
       } else {
         setShowAlerts(false);
@@ -2963,7 +3412,7 @@ function App() {
     var monthNames = ["Janvier", "Fevrier", "Mars", "Avril", "Mai", "Juin", "Juillet", "Aout", "Septembre", "Octobre", "Novembre", "Decembre"];
     var bdayClients = clients.filter(function (c) {
       if (!c.birthday) return false;
-      return new Date(c.birthday).getMonth() === currentMonth;
+      var pb = parseBirthday(c.birthday); return pb && pb.month === currentMonth;
     });
     var bons = localGet("bons_cadeaux");
     var todayStr = now.toISOString().slice(0, 10);
@@ -2973,7 +3422,17 @@ function App() {
     var bonsExp = bons.filter(function (b) {
       return b.dateFin >= todayStr && b.dateFin <= dans30jStr;
     });
-    if (bdayClients.length === 0 && bonsExp.length === 0) return null;
+    var clientSoinCount = {};
+    invoices.forEach(function(inv){
+      if (!inv.client || !inv.client.id) return;
+      var n = (inv.items||[]).reduce(function(s,it){return s+(it.qty||1);},0);
+      clientSoinCount[inv.client.id] = (clientSoinCount[inv.client.id]||0) + n;
+    });
+    var fidelityClients = clients.filter(function(c){
+      var n = clientSoinCount[c.id] || 0;
+      return n === 8 || n === 9;
+    }).map(function(c){ return Object.assign({}, c, {soinCount: clientSoinCount[c.id]}); });
+    if (bdayClients.length === 0 && bonsExp.length === 0 && fidelityClients.length === 0) return null;
     return /*#__PURE__*/React.createElement("div", {
       className: "alert-popup"
     }, /*#__PURE__*/React.createElement("div", {
@@ -3002,7 +3461,8 @@ function App() {
         color: "var(--gold)"
       }
     }, "\uD83C\uDF82 Anniversaires du mois"), bdayClients.map(function (c) {
-      var jour = new Date(c.birthday).getDate();
+      var pb = parseBirthday(c.birthday) || {day:1};
+      var jour = pb.day;
       return /*#__PURE__*/React.createElement("div", {
         className: "alert-item",
         key: c.id
@@ -3065,6 +3525,22 @@ function App() {
           color: "var(--danger)"
         }
       }, jRestants, "j restant(s)"));
+    })), fidelityClients.length > 0 && /*#__PURE__*/React.createElement("div", {
+      className: "alert-section",
+      style: {background: "linear-gradient(135deg,#F3EFF9,#EEEAF6)", border: "1px solid #E0D5EE"}
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "alert-section-title",
+      style: {color: "var(--lav-dk)"}
+    }, "\uD83C\uDF1F Bient\xF4t fid\xE8les"), fidelityClients.map(function(c){
+      return /*#__PURE__*/React.createElement("div", {className: "alert-item", key: c.id},
+        /*#__PURE__*/React.createElement("div", null,
+          /*#__PURE__*/React.createElement("span", {style:{fontWeight:700}}, c.name, c.firstname?" "+c.firstname:""),
+          /*#__PURE__*/React.createElement("span", {style:{fontSize:12, color:"var(--text-lt)", marginLeft:8}}, c.soinCount, " soins")
+        ),
+        /*#__PURE__*/React.createElement("span", {
+          style: {fontSize: 11, fontWeight: 700, color: "var(--lav-dk)", background:"#fff", padding:"3px 10px", borderRadius:12}
+        }, c.soinCount === 9 ? "Offrir le 10\xE8me !" : "Bient\xF4t le 10\xE8me")
+      );
     })), /*#__PURE__*/React.createElement("button", {
       className: "alert-close-btn",
       onClick: function () {
@@ -3099,12 +3575,23 @@ function App() {
     }, t.label));
   }))), /*#__PURE__*/React.createElement("main", {
     className: "main-content"
-  }, tab === "dashboard" && /*#__PURE__*/React.createElement(Dashboard, {
+  }, tab === "planning" && /*#__PURE__*/React.createElement(PlanningPage, {
+    appointments: appointments,
+    setAppointments: setAppointments,
+    clients: clients,
+    setClients: setClients,
+    services: services,
     invoices: invoices,
-    clients: clients
+    setInvoices: setInvoices,
+    setTab: setTab
+  }), tab === "dashboard" && /*#__PURE__*/React.createElement(Dashboard, {
+    invoices: invoices,
+    clients: clients,
+    services: services
   }), tab === "clients" && /*#__PURE__*/React.createElement(ClientsPage, {
     clients: clients,
-    setClients: setClients
+    setClients: setClients,
+    invoices: invoices
   }), tab === "services" && /*#__PURE__*/React.createElement(ServicesPage, {
     services: services,
     setServices: setServices
