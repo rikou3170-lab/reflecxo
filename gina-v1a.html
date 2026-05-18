@@ -1,0 +1,3056 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#8B7CB8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#8B7CB8">
+<title>Réflexologie — Georgiana Villemot</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#EEEAF6;--bg-warm:#E6E0F0;--card:#FFFFFF;--border:#E8E0F0;--border-light:#F0EAF5;
+  --lav:#8B7CB8;--lav-dk:#6B5A9E;--lav-lt:#C4B0E0;--lav-bg:#F3EFF9;--lav-glow:#EDE6F6;
+  --gold:#C9A24D;--gold-soft:#D4B76A;
+  --text:#3E3650;--text-mid:#6B617E;--text-lt:#9D93AE;
+  --ok:#7BA07E;--ok-bg:#EDF5EE;--warn:#C4A24E;--warn-bg:#FFF8E8;--danger:#C07B7B;
+  --sh-sm:0 1px 4px rgba(62,54,80,.04);--sh:0 2px 14px rgba(62,54,80,.06);--sh-lg:0 8px 30px rgba(62,54,80,.1);
+  --r:14px;--rs:10px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{background:var(--bg)}
+body{font-family:'Quicksand',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;
+  background-image:radial-gradient(ellipse at 0% 0%,rgba(139,124,184,.04) 0%,transparent 50%),radial-gradient(ellipse at 100% 100%,rgba(201,162,77,.04) 0%,transparent 50%)}
+.sidebar{background:linear-gradient(180deg,#3E3650 0%,#5A4D6E 100%);width:220px;position:fixed;top:0;left:0;height:100vh;z-index:100;display:flex;flex-direction:column;box-shadow:2px 0 20px rgba(62,54,80,.1)}
+.sidebar-brand{padding:28px 20px 20px;border-bottom:1px solid rgba(255,255,255,.08)}
+.sidebar-brand h1{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;font-style:italic;color:var(--lav-lt);line-height:1.3}
+.sidebar-brand p{font-size:10px;color:rgba(255,255,255,.4);font-weight:600;letter-spacing:.04em;margin-top:6px}
+.sidebar-nav{padding:16px 10px;flex:1}
+.tab-btn{display:flex;align-items:center;gap:10px;padding:12px 16px;border:none;background:none;font-family:'Quicksand',sans-serif;font-size:13px;font-weight:600;color:rgba(255,255,255,.5);cursor:pointer;border-radius:var(--rs);transition:all .25s;position:relative;width:100%;text-align:left;margin-bottom:4px}
+.tab-btn:hover{color:rgba(255,255,255,.85);background:rgba(255,255,255,.06)}
+.tab-btn.active{color:#E8D5F0;background:rgba(139,124,184,.2)}
+.tab-btn.active::after{display:none}
+.tab-icon{font-size:15px;width:22px;text-align:center}
+.main-content{margin-left:220px;padding:28px 32px 60px}
+.page-header{margin-bottom:24px}
+.page-header h2{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;color:var(--lav-dk);font-style:italic}
+.page-header p{color:var(--text-lt);font-size:13px;margin-top:4px;font-weight:500}
+.card{background:var(--card);border:1px solid var(--border-light);border-radius:var(--r);box-shadow:var(--sh);padding:24px;margin-bottom:20px;position:relative;overflow:hidden}
+.card-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;font-style:italic;margin-bottom:16px;color:var(--lav-dk);display:flex;align-items:center;gap:10px}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:24px}
+.stat-card{background:var(--card);border:1px solid var(--border-light);border-radius:var(--r);padding:22px 20px;box-shadow:var(--sh);position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--lav-lt),var(--lav),var(--gold-soft))}
+.stat-label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-lt);font-weight:700;margin-bottom:8px}
+.stat-value{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;color:var(--lav-dk)}
+.stat-sub{font-size:12px;color:var(--text-lt);margin-top:4px;font-weight:500}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 22px;border-radius:25px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .25s;font-family:'Quicksand',sans-serif}
+.btn-primary{background:linear-gradient(135deg,var(--lav) 0%,var(--lav-dk) 100%);color:#fff;box-shadow:0 3px 12px rgba(139,124,184,.3)}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 5px 16px rgba(139,124,184,.35)}
+.btn-primary:disabled{opacity:.5;cursor:default;transform:none}
+.btn-secondary{background:var(--lav-bg);color:var(--lav-dk);border:1px solid var(--border)}
+.btn-secondary:hover{background:var(--lav-glow)}
+.btn-danger{background:#FDF2F0;color:var(--danger);border:1px solid #F0D5D5}
+.btn-danger:hover{background:#FAE5E5}
+.btn-sm{padding:6px 16px;font-size:12px}
+.form-group{margin-bottom:16px}
+.form-label{display:block;font-size:12px;font-weight:700;color:var(--text-mid);margin-bottom:6px;letter-spacing:.03em}
+.form-input,.form-select,.form-textarea{width:100%;padding:11px 16px;border:1.5px solid var(--border);border-radius:25px;font-size:14px;font-family:'Quicksand',sans-serif;color:var(--text);background:var(--card);transition:all .2s;font-weight:500}
+.form-textarea{border-radius:var(--rs);resize:vertical;min-height:70px}
+.form-input:focus,.form-select:focus,.form-textarea:focus{outline:none;border-color:var(--lav-lt);box-shadow:0 0 0 3px rgba(139,124,184,.1)}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-lt);text-align:left;padding:10px 12px;border-bottom:2px solid var(--border);font-weight:700}
+td{padding:14px 12px;border-bottom:1px solid var(--border-light);font-size:13px;font-weight:500}
+tr:hover td{background:var(--lav-bg)}
+.badge{display:inline-block;padding:4px 14px;border-radius:20px;font-size:11px;font-weight:700}
+.badge-paid{background:var(--ok-bg);color:var(--ok)}
+.badge-pending{background:var(--warn-bg);color:var(--warn)}
+.modal-overlay{position:fixed;inset:0;background:rgba(62,54,80,.3);backdrop-filter:blur(6px);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal{background:var(--card);border-radius:20px;width:100%;max-width:620px;max-height:90vh;overflow-y:auto;box-shadow:var(--sh-lg)}
+.modal-header{padding:22px 26px;border-bottom:1px solid var(--border-light);display:flex;justify-content:space-between;align-items:center}
+.modal-header h3{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;font-style:italic;color:var(--lav-dk)}
+.modal-close{background:var(--lav-bg);border:none;width:34px;height:34px;border-radius:50%;font-size:16px;color:var(--text-lt);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.modal-close:hover{background:var(--border);color:var(--text)}
+.modal-body{padding:24px 26px}
+.modal-footer{padding:16px 26px;border-top:1px solid var(--border-light);display:flex;justify-content:flex-end;gap:10px}
+.service-option{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border:1.5px solid var(--border-light);border-radius:var(--r);margin-bottom:8px;cursor:pointer;transition:all .2s;background:var(--card)}
+.service-option:hover{border-color:var(--lav-lt);background:var(--lav-bg)}
+.service-option.selected{border-color:var(--lav);background:var(--lav-bg);box-shadow:0 0 0 3px rgba(139,124,184,.08)}
+.service-name{font-size:13px;font-weight:600}
+.service-detail{font-size:11px;color:var(--text-lt);margin-top:2px;font-weight:500}
+.service-price{font-weight:700;color:var(--lav-dk);font-size:15px;white-space:nowrap}
+.qty-ctrl{display:flex;align-items:center;gap:6px;margin-top:8px}
+.qty-btn{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--lav-lt);background:#fff;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;color:var(--lav-dk);font-weight:700}
+.qty-btn:hover{background:var(--lav-bg)}
+.qty-val{font-size:14px;font-weight:700;min-width:22px;text-align:center;color:var(--lav-dk)}
+.invoice-preview{background:#fff;border:1px solid var(--border);border-radius:var(--r);padding:32px;font-size:13px;position:relative;overflow:hidden}
+.svc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.svc-card{background:var(--card);border:1px solid var(--border-light);border-radius:var(--r);padding:22px 20px;box-shadow:var(--sh-sm);display:flex;flex-direction:column;justify-content:space-between;transition:all .25s;position:relative;overflow:hidden}
+.svc-card:hover{box-shadow:var(--sh);transform:translateY(-2px)}
+.svc-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--lav-lt),var(--gold-soft));opacity:0;transition:opacity .25s}
+.svc-card:hover::after{opacity:1}
+.svc-name{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;font-style:italic;color:var(--lav-dk);margin-bottom:8px}
+.svc-desc{font-size:12px;color:var(--text-lt);line-height:1.5;margin-bottom:14px;font-weight:500}
+.svc-footer{display:flex;justify-content:space-between;align-items:center;padding-top:12px;border-top:1px solid var(--border-light)}
+.svc-duration{font-size:12px;color:var(--text-lt);font-weight:600}
+.svc-price{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:700;color:var(--lav-dk)}
+.empty-state{text-align:center;padding:48px 20px;color:var(--text-lt)}
+.empty-icon{font-size:36px;margin-bottom:12px;opacity:.4}
+.empty-state p{font-size:14px;font-weight:500}
+.clickable-row{cursor:pointer}
+.ornament-divider{display:flex;align-items:center;gap:12px;margin:8px 0 20px;color:var(--lav-lt);font-size:12px}
+.ornament-divider::before,.ornament-divider::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent)}
+.chart-bar-wrap{display:flex;align-items:flex-end;gap:8px;height:160px;padding-top:10px}
+.chart-col{flex:1;display:flex;flex-direction:column;align-items:center;height:100%;justify-content:flex-end}
+.chart-bar{width:100%;max-width:36px;background:linear-gradient(180deg,var(--lav-lt) 0%,var(--lav) 100%);border-radius:8px 8px 0 0;transition:height .5s ease;min-height:2px}
+.chart-label{font-size:10px;color:var(--text-lt);margin-top:6px;font-weight:600}
+.chart-val{font-size:10px;font-weight:700;color:var(--lav-dk);margin-bottom:4px}
+.invoice-total-row{display:flex;justify-content:flex-end;align-items:center;margin-top:16px;padding-top:14px;border-top:2px solid var(--lav)}
+.invoice-total-label{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-lt);margin-right:20px;font-weight:700}
+.invoice-total-value{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;color:var(--lav-dk)}
+.invoice-footer-note{margin-top:28px;padding-top:14px;border-top:1px solid var(--border-light);font-size:10px;color:var(--text-lt);text-align:center;line-height:1.7;font-weight:500}
+@media(max-width:768px){
+  .sidebar{width:180px}
+  .main-content{margin-left:180px;padding:20px 14px 40px}
+  .stats-grid{grid-template-columns:1fr 1fr}.svc-grid{grid-template-columns:1fr}
+}
+.splash{position:fixed;inset:0;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(135deg,#3E3650 0%,#5A4D6E 40%,#8B7CB8 100%);transition:opacity .8s ease,transform .8s ease}
+.splash.fade-out{opacity:0;transform:scale(1.05);pointer-events:none}
+.splash-lotus{animation:splashPulse 2s ease-in-out infinite}
+.splash-title{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;font-style:italic;color:#E8D5F0;margin-top:24px;text-align:center;opacity:0;animation:splashFadeUp .8s ease .3s forwards}
+.splash-sub{font-family:'Quicksand',sans-serif;font-size:13px;font-weight:600;color:rgba(255,255,255,.45);letter-spacing:.06em;margin-top:8px;opacity:0;animation:splashFadeUp .8s ease .6s forwards}
+.splash-line{width:60px;height:2px;background:linear-gradient(90deg,transparent,#C4B0E0,transparent);margin-top:20px;opacity:0;animation:splashFadeUp .8s ease .9s forwards}
+.splash-dots{margin-top:32px;display:flex;gap:8px;opacity:0;animation:splashFadeUp .6s ease 1.2s forwards}
+.splash-dot{width:6px;height:6px;border-radius:50%;background:#C4B0E0;animation:dotBounce 1.2s ease infinite}
+.splash-dot:nth-child(2){animation-delay:.2s}
+.splash-dot:nth-child(3){animation-delay:.4s}
+@keyframes splashPulse{0%,100%{transform:scale(1);opacity:.8}50%{transform:scale(1.08);opacity:1}}
+@keyframes splashFadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes dotBounce{0%,100%{transform:translateY(0);opacity:.4}50%{transform:translateY(-6px);opacity:1}}
+.alert-popup{position:fixed;inset:0;z-index:9998;background:rgba(62,54,80,.5);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:20px;animation:alertFadeIn .4s ease}
+.alert-popup-inner{background:#fff;border-radius:24px;width:100%;max-width:520px;max-height:85vh;overflow-y:auto;box-shadow:0 20px 60px rgba(62,54,80,.2);padding:36px 32px}
+.alert-popup-title{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;font-style:italic;color:var(--lav-dk);text-align:center;margin-bottom:8px}
+.alert-popup-sub{font-size:13px;color:var(--text-lt);text-align:center;margin-bottom:28px;font-weight:500}
+.alert-section{margin-bottom:24px;padding:20px;border-radius:16px}
+.alert-section-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;font-style:italic;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.alert-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid rgba(0,0,0,.05)}
+.alert-item:last-child{border-bottom:none}
+.alert-close-btn{display:block;width:100%;padding:16px;border-radius:16px;border:none;background:linear-gradient(135deg,var(--lav),var(--lav-dk));color:#fff;font-family:'Quicksand',sans-serif;font-size:15px;font-weight:700;cursor:pointer;margin-top:8px;box-shadow:0 4px 16px rgba(139,124,184,.3);transition:transform .2s}
+.alert-close-btn:hover{transform:translateY(-1px)}
+@keyframes alertFadeIn{from{opacity:0}to{opacity:1}}
+.login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#3E3650 0%,#5A4D6E 40%,#8B7CB8 100%)}
+.login-box{background:#fff;border-radius:24px;padding:48px 40px;width:100%;max-width:380px;text-align:center;box-shadow:0 20px 60px rgba(62,54,80,.25)}
+.login-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;font-style:italic;color:var(--lav-dk);margin:20px 0 8px}
+.login-sub{font-size:13px;color:var(--text-lt);margin-bottom:28px;font-weight:500}
+.login-input{width:100%;padding:14px 20px;border:2px solid var(--border);border-radius:16px;font-size:20px;font-family:'Quicksand',sans-serif;text-align:center;letter-spacing:8px;font-weight:700;color:var(--lav-dk);background:var(--lav-bg);transition:border .2s}
+.login-input:focus{outline:none;border-color:var(--lav)}
+.login-btn{width:100%;padding:14px;border-radius:16px;border:none;background:linear-gradient(135deg,var(--lav),var(--lav-dk));color:#fff;font-family:'Quicksand',sans-serif;font-size:15px;font-weight:700;cursor:pointer;margin-top:16px;box-shadow:0 4px 16px rgba(139,124,184,.3)}
+.login-btn:hover{transform:translateY(-1px)}
+.login-btn:disabled{opacity:.5;cursor:default;transform:none}
+.login-error{color:var(--danger);font-size:12px;font-weight:600;margin-top:12px}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.0/firebase-auth-compat.js"></script>
+
+<script>
+// ══════════════════════════════════════════════
+// ⚠️  CONFIGURATION FIREBASE — À MODIFIER  ⚠️
+// ══════════════════════════════════════════════
+firebase.initializeApp({
+  apiKey: "AIzaSyBrismr3dsUweI1hhBKRJ48twqAx6o5U_0",
+  authDomain: "reflexo-gina.firebaseapp.com",
+  projectId: "reflexo-gina",
+  storageBucket: "reflexo-gina.firebasestorage.app",
+  messagingSenderId: "852093395214",
+  appId: "1:852093395214:web:6cd485e7cd40888508b75f"
+});
+var db = firebase.firestore();
+var auth = firebase.auth();
+
+// ══════════════════════════════════════════════
+// ⚠️  COMPTE GINA — À CRÉER DANS FIREBASE  ⚠️
+// Console Firebase > Authentication > Ajouter un utilisateur
+// Email : gina@reflexo.app   Mot de passe : le PIN choisi
+// ══════════════════════════════════════════════
+var AUTH_EMAIL = "gina@reflexo.app";
+
+// Cache locale + sync Firestore
+function localGet(key) { try { return JSON.parse(localStorage.getItem(key)) || []; } catch(e) { return []; } }
+function localSet(key, data) {
+  localStorage.setItem(key, JSON.stringify(data));
+  db.doc("data/" + key).set({items: data}).catch(function(e){ console.error(e); });
+}
+async function localLoad(key, fallback) {
+  try {
+    var snap = await db.doc("data/" + key).get();
+    if (snap.exists && snap.data().items) {
+      var items = snap.data().items;
+      localStorage.setItem(key, JSON.stringify(items));
+      return items;
+    }
+    return fallback;
+  } catch(e) { return localGet(key).length > 0 ? localGet(key) : fallback; }
+}
+
+function playChime() {
+  try {
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    var notes = [523.25, 659.25, 783.99, 1046.50];
+    notes.forEach(function(freq, i) {
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0, ctx.currentTime + i * 0.3);
+      gain.gain.linearRampToValueAtTime(0.15, ctx.currentTime + i * 0.3 + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.3 + 1.2);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(ctx.currentTime + i * 0.3);
+      osc.stop(ctx.currentTime + i * 0.3 + 1.5);
+    });
+  } catch(e) {}
+}
+</script>
+
+<!-- React -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+
+
+
+<script>const {
+  useState,
+  useEffect,
+  useCallback
+} = React;
+
+// ─── DATA ───
+const DEFAULT_SERVICES = [{
+  id: 1,
+  name: "Thérapie manuelle somato-émotionnelle",
+  duration: "1h",
+  price: 55,
+  desc: "Équilibre l'énergie du corps, soulage les douleurs physiques et émotionnelles"
+}, {
+  id: 2,
+  name: "Réflexologie plantaire",
+  duration: "1h",
+  price: 45,
+  desc: "Stimule et améliore le fonctionnement des organes, soulage différents maux"
+}, {
+  id: 3,
+  name: "Sevrage Tabagique",
+  duration: "1 séance",
+  price: 70,
+  desc: "Réflexologie auriculaire — stoppe l'envie de fumer, régule les sauts d'humeur"
+}, {
+  id: 4,
+  name: "Massage énergétique revitalisant",
+  duration: "1h30",
+  price: 85,
+  desc: "Lâcher prise et détente, 2 mélanges d'huiles essentielles"
+}, {
+  id: 5,
+  name: "Massage des pieds aux huiles essentielles",
+  duration: "1h",
+  price: 45,
+  desc: "Détente, jambes légères, drainant"
+}, {
+  id: 6,
+  name: "Massage des méridiens du pied",
+  duration: "30 min",
+  price: 55,
+  desc: "Équilibre les organes, soulage contractures, efficace contre la cellulite"
+}, {
+  id: 7,
+  name: "Massage des mains et oreilles",
+  duration: "45 min",
+  price: 30,
+  desc: "Détente et bien-être"
+}, {
+  id: 8,
+  name: "Soins énergétiques",
+  duration: "1h",
+  price: 40,
+  desc: "Rééquilibrage énergétique global"
+}];
+const CAB = {
+  name: "Réflexologie et Thérapie Manuelle",
+  owner: "Georgiana Villemot EI",
+  title: "Praticienne en Réflexologie et Thérapie Manuelle",
+  address: "3 rue Jean Chamagne",
+  city: "70220 Fougerolles",
+  phone: "06 71 55 37 58",
+  email: "ginabogdan@ymail.com",
+  siret: "90398188400013",
+  ape: "9609Z",
+  legal: "Dispensé(e) d'immatriculation au RCS et au RM"
+};
+const TABS = [{
+  id: "invoices",
+  label: "Factures",
+  icon: "❋"
+}, {
+  id: "clients",
+  label: "Gestion clientèle",
+  icon: "❀"
+}, {
+  id: "services",
+  label: "Soins",
+  icon: "✾"
+}, {
+  id: "boncadeau",
+  label: "Bon cadeau",
+  icon: "🎁"
+}, {
+  id: "dashboard",
+  label: "Tableau de bord",
+  icon: "✿"
+}];
+
+// ─── HELPERS ───
+function genNum(invoices) {
+  var now = new Date(),
+    y = now.getFullYear(),
+    m = String(now.getMonth() + 1).padStart(2, "0");
+  var prefix = "F" + y + m;
+  var count = invoices.filter(function (i) {
+    return i.number && i.number.indexOf(prefix) === 0;
+  }).length;
+  return prefix + "-" + String(count + 1).padStart(3, "0");
+}
+function fmtDate(d) {
+  return new Date(d).toLocaleDateString("fr-FR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  });
+}
+function fmtEuro(n) {
+  return new Intl.NumberFormat("fr-FR", {
+    style: "currency",
+    currency: "EUR"
+  }).format(n);
+}
+
+// ─── FIRESTORE CRUD ───
+async function fbGetAll(col) {
+  var snap = await db.collection(col).get();
+  return snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+}
+async function fbAdd(col, data) {
+  var ref = await db.collection(col).add(data);
+  return Object.assign({id:ref.id}, data);
+}
+async function fbUpdate(col, id, data) {
+  await db.collection(col).doc(id).update(data);
+}
+async function fbDelete(col, id) {
+  await db.collection(col).doc(id).delete();
+}
+// Helper pour stocker un tableau dans un seul doc
+async function fbSaveArray(docPath, arr) {
+  await db.doc(docPath).set({items: arr});
+}
+async function fbLoadArray(docPath, fallback) {
+  try { var snap = await db.doc(docPath).get(); if(snap.exists) return snap.data().items || fallback; return fallback; } catch(e) { return fallback; }
+}
+
+// ─── SVG ───
+function SwirlCorner({
+  style,
+  flip
+}) {
+  return /*#__PURE__*/React.createElement("svg", {
+    viewBox: "0 0 120 120",
+    style: Object.assign({
+      position: "absolute",
+      width: 90,
+      height: 90,
+      opacity: .1,
+      pointerEvents: "none"
+    }, style, flip ? {
+      transform: "scaleX(-1)"
+    } : {})
+  }, /*#__PURE__*/React.createElement("path", {
+    d: "M10,110 Q10,60 40,40 Q60,25 80,30 Q95,34 90,50 Q85,65 70,60 Q58,56 62,45 Q65,36 75,38",
+    fill: "none",
+    stroke: "#8B7CB8",
+    strokeWidth: "2.5"
+  }), /*#__PURE__*/React.createElement("path", {
+    d: "M15,105 Q20,75 45,55 Q60,44 72,50",
+    fill: "none",
+    stroke: "#8B7CB8",
+    strokeWidth: "1.5"
+  }), /*#__PURE__*/React.createElement("circle", {
+    cx: "90",
+    cy: "38",
+    r: "3",
+    fill: "#C4B0E0",
+    opacity: ".5"
+  }), /*#__PURE__*/React.createElement("circle", {
+    cx: "72",
+    cy: "50",
+    r: "2.5",
+    fill: "#C4B0E0",
+    opacity: ".5"
+  }), /*#__PURE__*/React.createElement("path", {
+    d: "M5,95 Q15,80 30,75 Q42,71 48,78 Q52,84 44,88 Q36,91 34,82",
+    fill: "none",
+    stroke: "#C4B0E0",
+    strokeWidth: "1.8"
+  }));
+}
+function Lotus({
+  size = 28,
+  color = "#9B8ABF"
+}) {
+  return /*#__PURE__*/React.createElement("svg", {
+    viewBox: "0 0 100 80",
+    width: size,
+    height: size * .8,
+    style: {
+      display: "inline-block",
+      verticalAlign: "middle"
+    }
+  }, /*#__PURE__*/React.createElement("ellipse", {
+    cx: "50",
+    cy: "55",
+    rx: "12",
+    ry: "22",
+    fill: color,
+    opacity: ".25",
+    transform: "rotate(-25 50 55)"
+  }), /*#__PURE__*/React.createElement("ellipse", {
+    cx: "50",
+    cy: "55",
+    rx: "12",
+    ry: "22",
+    fill: color,
+    opacity: ".25",
+    transform: "rotate(25 50 55)"
+  }), /*#__PURE__*/React.createElement("ellipse", {
+    cx: "50",
+    cy: "52",
+    rx: "10",
+    ry: "24",
+    fill: color,
+    opacity: ".3"
+  }), /*#__PURE__*/React.createElement("ellipse", {
+    cx: "38",
+    cy: "58",
+    rx: "9",
+    ry: "18",
+    fill: color,
+    opacity: ".2",
+    transform: "rotate(-40 38 58)"
+  }), /*#__PURE__*/React.createElement("ellipse", {
+    cx: "62",
+    cy: "58",
+    rx: "9",
+    ry: "18",
+    fill: color,
+    opacity: ".2",
+    transform: "rotate(40 62 58)"
+  }), /*#__PURE__*/React.createElement("ellipse", {
+    cx: "50",
+    cy: "50",
+    rx: "7",
+    ry: "18",
+    fill: color,
+    opacity: ".45"
+  }), /*#__PURE__*/React.createElement("circle", {
+    cx: "50",
+    cy: "42",
+    r: "4",
+    fill: "#D4A843",
+    opacity: ".6"
+  }));
+}
+
+// ─── PRINT ───
+function doPrint(inv) {
+  var rows = "";
+  for (var i = 0; i < inv.items.length; i++) {
+    var it = inv.items[i],
+      q = it.qty || 1;
+    rows += "<tr><td>" + it.name + "</td><td>" + it.duration + "</td><td>" + q + "</td><td style='text-align:right;font-weight:600'>" + (it.price * q).toFixed(2) + " €</td></tr>";
+  }
+  var payLine = inv.payMethod ? "<div><span class='dl'>Mode paiement : </span><span class='dv'>" + inv.payMethod + "</span></div>" : "";
+  var paidLine = inv.paid !== undefined ? "<div class='pi'>" + (inv.paid ? "Payée" : "En attente de paiement") + "</div>" : "";
+  var noteLine = inv.note ? "<div class='nt'>Note : " + inv.note + "</div>" : "";
+  var cPhone = inv.client.phone ? "<div class='pi2'>" + inv.client.phone + "</div>" : "";
+  var cAddr = inv.client.address ? "<div class='pi2'>" + inv.client.address + "</div>" : "";
+  var h = ["<!DOCTYPE html><html><head><meta charset='utf-8'><title>Facture " + inv.number + "</title>", "<link href='https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Quicksand:wght@400;500;600;700&display=swap' rel='stylesheet'>", "<style>@page{size:A4;margin:20mm}*{margin:0;padding:0;box-sizing:border-box}", "body{font-family:'Quicksand',sans-serif;color:#3E3650;padding:40px;max-width:800px;margin:0 auto}", ".tt{text-align:center;margin-bottom:30px}.tt h1{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;color:#6B5A9E}.tt .nm{font-size:12px;color:#9D93AE;margin-top:4px}", ".pa{display:flex;justify-content:space-between;margin-bottom:28px}", ".pl{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#8B7CB8;font-weight:700;margin-bottom:8px}", ".pn{font-weight:600;font-size:14px}.pt{font-size:12px;color:#6B5A9E;font-style:italic;margin-bottom:4px}", ".pi2{font-size:12px;color:#9D93AE;line-height:1.8}.plg{font-size:11px;color:#9D93AE;line-height:1.7;margin-top:8px}", ".dr{display:flex;justify-content:space-between;margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid #F3EFF9}", ".dl{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#9D93AE;font-weight:700}.dv{font-size:13px;font-weight:500}", "table{width:100%;border-collapse:collapse;margin-top:8px}th{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#9D93AE;text-align:left;padding:10px 8px;border-bottom:2px solid #E8E0F0;font-weight:700}", "td{padding:12px 8px;border-bottom:1px solid #F0EAF5;font-size:13px;font-weight:500}", ".tr{display:flex;justify-content:flex-end;align-items:center;margin-top:16px;padding-top:14px;border-top:2px solid #8B7CB8}", ".tl{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#9D93AE;margin-right:20px;font-weight:700}", ".tv{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;color:#6B5A9E}", ".pi{text-align:right;font-size:12px;color:#9D93AE;margin-top:8px;font-weight:500}", ".nt{font-size:12px;color:#9D93AE;margin-top:12px;font-style:italic}", ".ft{margin-top:40px;padding-top:14px;border-top:1px solid #F0EAF5;font-size:10px;color:#9D93AE;text-align:center;line-height:1.8;font-weight:500}", "</style></head><body>", "<div class='tt'><h1>Facture</h1><div class='nm'>" + inv.number + "</div></div>", "<div class='pa'><div>", "<div class='pl'>Facturé par</div><div class='pn'>" + CAB.owner + "</div><div class='pt'>" + CAB.title + "</div>", "<div class='pi2'>" + CAB.address + "<br>" + CAB.city + "<br>Tél : " + CAB.phone + "<br>Mail : " + CAB.email + "</div>", "<div class='plg'>SIRET : " + CAB.siret + "<br>Code APE : " + CAB.ape + "<br>" + CAB.legal + "</div>", "</div><div style='text-align:right'>", "<div class='pl'>Facturé à</div><div class='pn'>" + inv.client.name + (inv.client.firstname ? " " + inv.client.firstname : "") + "</div>" + cPhone + cAddr, "</div></div>", "<div class='dr'><div><span class='dl'>Date : </span><span class='dv'>" + fmtDate(inv.date) + "</span></div>" + payLine + "</div>", "<table><thead><tr><th>Prestation</th><th>Durée</th><th>Qté</th><th style='text-align:right'>Prix</th></tr></thead><tbody>" + rows + "</tbody></table>", "<div class='tr'><span class='tl'>Total</span><span class='tv'>" + fmtEuro(inv.total) + "</span></div>", paidLine, noteLine, "<div class='ft'>" + CAB.owner + " — SIRET : " + CAB.siret + " — Code APE : " + CAB.ape + "<br>" + CAB.address + ", " + CAB.city + " — Tél : " + CAB.phone + "<br>TVA non applicable, article 293 B du CGI</div>", "</body></html>"].join("\n");
+  var w = window.open("", "_blank");
+  if (w) {
+    w.document.write(h);
+    w.document.close();
+    setTimeout(function () {
+      w.print();
+    }, 500);
+  }
+}
+
+// ═══════════════ COMPONENTS ═══════════════
+
+function Dashboard({
+  invoices,
+  clients
+}) {
+  var now = new Date();
+  const [selectedYear, setSelectedYear] = useState(now.getFullYear());
+  const [selMonthIdx, setSelMonthIdx] = useState(now.getMonth());
+  const [selMonthYear, setSelMonthYear] = useState(now.getFullYear());
+  var years = [];
+  invoices.forEach(function (i) {
+    var y = new Date(i.date).getFullYear();
+    if (years.indexOf(y) < 0) years.push(y);
+  });
+  if (years.indexOf(now.getFullYear()) < 0) years.push(now.getFullYear());
+  years.sort(function (a, b) {
+    return b - a;
+  });
+  var monthNames = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"];
+  var monthsShort = ["Jan", "Fév", "Mar", "Avr", "Mai", "Jun", "Jul", "Aoû", "Sep", "Oct", "Nov", "Déc"];
+  var prevMonth = function () {
+    if (selMonthIdx === 0) {
+      setSelMonthIdx(11);
+      setSelMonthYear(selMonthYear - 1);
+    } else {
+      setSelMonthIdx(selMonthIdx - 1);
+    }
+  };
+  var nextMonth = function () {
+    if (selMonthIdx === now.getMonth() && selMonthYear === now.getFullYear()) return;
+    if (selMonthIdx === 11) {
+      setSelMonthIdx(0);
+      setSelMonthYear(selMonthYear + 1);
+    } else {
+      setSelMonthIdx(selMonthIdx + 1);
+    }
+  };
+  var isCurrentMonth = selMonthIdx === now.getMonth() && selMonthYear === now.getFullYear();
+  var selMonthInv = invoices.filter(function (i) {
+    var d = new Date(i.date);
+    return d.getMonth() === selMonthIdx && d.getFullYear() === selMonthYear;
+  });
+  var totalSelMonth = selMonthInv.reduce(function (s, i) {
+    return s + i.total;
+  }, 0);
+
+  // Mini sparkline: 6 derniers mois depuis le mois sélectionné
+  var spark = [];
+  for (var si = 5; si >= 0; si--) {
+    var sm = selMonthIdx - si;
+    var sy = selMonthYear;
+    while (sm < 0) {
+      sm += 12;
+      sy--;
+    }
+    var mt = invoices.filter(function (inv) {
+      var d = new Date(inv.date);
+      return d.getMonth() === sm && d.getFullYear() === sy;
+    }).reduce(function (s, inv) {
+      return s + inv.total;
+    }, 0);
+    spark.push({
+      label: monthsShort[sm],
+      total: mt
+    });
+  }
+  var sparkMax = Math.max.apply(null, spark.map(function (s) {
+    return s.total;
+  }).concat([1]));
+  var yearInv = invoices.filter(function (i) {
+    return new Date(i.date).getFullYear() === selectedYear;
+  });
+  var totalYear = yearInv.reduce(function (s, i) {
+    return s + i.total;
+  }, 0);
+  var soinsYear = yearInv.reduce(function (s, i) {
+    return s + (i.items || []).reduce(function (ss, it) {
+      return ss + (it.qty || 1);
+    }, 0);
+  }, 0);
+  var monthlyData = monthsShort.map(function (label, idx) {
+    var t = yearInv.filter(function (i) {
+      return new Date(i.date).getMonth() === idx;
+    }).reduce(function (s, i) {
+      return s + i.total;
+    }, 0);
+    return {
+      label: label,
+      total: t
+    };
+  });
+  var maxMonth = Math.max.apply(null, monthlyData.map(function (m) {
+    return m.total;
+  }).concat([1]));
+  var bestData = {};
+  invoices.forEach(function (inv) {
+    var d = new Date(inv.date),
+      key = d.getFullYear() + "-" + d.getMonth();
+    if (!bestData[key]) bestData[key] = {
+      total: 0,
+      m: d.getMonth(),
+      y: d.getFullYear()
+    };
+    bestData[key].total += inv.total;
+  });
+  var bestMonthTotal = 0,
+    bestMonthLabel = "—";
+  Object.keys(bestData).forEach(function (k) {
+    if (bestData[k].total > bestMonthTotal) {
+      bestMonthTotal = bestData[k].total;
+      bestMonthLabel = monthsShort[bestData[k].m] + " " + bestData[k].y;
+    }
+  });
+  var topSvc = {};
+  invoices.forEach(function (inv) {
+    (inv.items || []).forEach(function (it) {
+      topSvc[it.name] = (topSvc[it.name] || 0) + (it.qty || 1);
+    });
+  });
+  var topList = Object.entries(topSvc).sort(function (a, b) {
+    return b[1] - a[1];
+  }).slice(0, 5);
+  var currentMonth = now.getMonth();
+  var birthdayClients = clients.filter(function (c) {
+    if (!c.birthday) return false;
+    var bMonth = new Date(c.birthday).getMonth();
+    return bMonth === currentMonth;
+  });
+  var bons = localGet("bons_cadeaux");
+  var today = now.toISOString().slice(0, 10);
+  var dans30j = new Date(now);
+  dans30j.setDate(dans30j.getDate() + 30);
+  var dans30jStr = dans30j.toISOString().slice(0, 10);
+  var bonsExpirant = bons.filter(function (b) {
+    return b.dateFin >= today && b.dateFin <= dans30jStr;
+  });
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "page-header"
+  }, /*#__PURE__*/React.createElement("h2", null, "Tableau de bord"), /*#__PURE__*/React.createElement("p", null, "Bienvenue, Gina \u273F")), bonsExpirant.length > 0 && /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      marginBottom: 20,
+      borderLeft: "4px solid var(--danger)",
+      background: "linear-gradient(135deg,#FFF8F7,#FDF2F0)"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "card-title",
+    style: {
+      color: "var(--danger)"
+    }
+  }, "\u23F0 Bons cadeaux bient\xF4t expir\xE9s"), bonsExpirant.map(function (b) {
+    var jRestants = Math.ceil((new Date(b.dateFin) - now) / (1000 * 60 * 60 * 24));
+    return /*#__PURE__*/React.createElement("div", {
+      key: b.id,
+      style: {
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        padding: "10px 0",
+        borderBottom: "1px solid #F0D5D5"
+      }
+    }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontWeight: 700
+      }
+    }, b.beneficiaire || "Sans nom"), /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 12,
+        color: "var(--text-lt)",
+        marginLeft: 10
+      }
+    }, b.soin), /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 11,
+        color: "var(--danger)",
+        marginLeft: 10,
+        fontWeight: 600
+      }
+    }, jRestants, " jour(s) restant(s)")), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 11,
+        color: "var(--text-lt)"
+      }
+    }, "Expire le ", new Date(b.dateFin).toLocaleDateString("fr-FR")));
+  })), birthdayClients.length > 0 && /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      marginBottom: 20,
+      borderLeft: "4px solid var(--gold)",
+      background: "linear-gradient(135deg,#FFFDF5,#FFF8E8)"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "card-title",
+    style: {
+      color: "var(--gold)"
+    }
+  }, "\uD83C\uDF82 Anniversaires du mois"), birthdayClients.map(function (c) {
+    var bDay = new Date(c.birthday);
+    var jour = bDay.getDate();
+    var moisNom = monthNames[bDay.getMonth()];
+    return /*#__PURE__*/React.createElement("div", {
+      key: c.id,
+      style: {
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        padding: "10px 0",
+        borderBottom: "1px solid #F5EDDA"
+      }
+    }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontWeight: 700
+      }
+    }, c.name, c.firstname ? " " + c.firstname : ""), /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 12,
+        color: "var(--text-lt)",
+        marginLeft: 10
+      }
+    }, jour, " ", moisNom)), c.email && /*#__PURE__*/React.createElement("button", {
+      onClick: function () {
+        window.open("mailto:" + c.email + "?subject=" + encodeURIComponent("Joyeux anniversaire") + "&body=" + encodeURIComponent("Bonjour " + (c.firstname || c.name) + ",\n\nPour votre anniversaire je vous offre un bon cadeau pour une seance !\n\nA bientot,\nGeorgiana"));
+      },
+      style: {
+        fontSize: 12,
+        fontWeight: 600,
+        color: "var(--lav)",
+        border: "none",
+        cursor: "pointer",
+        padding: "6px 14px",
+        background: "var(--lav-bg)",
+        borderRadius: 20,
+        fontFamily: "'Quicksand',sans-serif"
+      }
+    }, "\uD83D\uDCE7 Envoyer un mail"));
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      marginBottom: 20
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 12
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-secondary btn-sm",
+    onClick: prevMonth
+  }, "\u25C0"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      textAlign: "center"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      textTransform: "uppercase",
+      letterSpacing: ".08em",
+      color: "var(--text-lt)",
+      fontWeight: 700
+    }
+  }, isCurrentMonth ? "Ce mois" : monthNames[selMonthIdx] + " " + selMonthYear), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: "'Cormorant Garamond',serif",
+      fontSize: 32,
+      fontWeight: 700,
+      color: "var(--lav-dk)"
+    }
+  }, fmtEuro(totalSelMonth)), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: "var(--text-lt)",
+      fontWeight: 500
+    }
+  }, selMonthInv.length, " facture(s)")), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-secondary btn-sm",
+    onClick: nextMonth,
+    disabled: isCurrentMonth,
+    style: isCurrentMonth ? {
+      opacity: .3,
+      cursor: "default"
+    } : {}
+  }, "\u25B6")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "flex-end",
+      gap: 6,
+      height: 60,
+      paddingTop: 8,
+      borderTop: "1px solid var(--border-light)"
+    }
+  }, spark.map(function (s, i) {
+    var isActive = i === spark.length - 1;
+    return /*#__PURE__*/React.createElement("div", {
+      key: i,
+      style: {
+        flex: 1,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "flex-end",
+        height: "100%"
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 9,
+        fontWeight: 700,
+        color: isActive ? "var(--lav-dk)" : "var(--text-lt)",
+        marginBottom: 3
+      }
+    }, s.total > 0 ? s.total + "€" : ""), /*#__PURE__*/React.createElement("div", {
+      style: {
+        width: "100%",
+        maxWidth: 28,
+        height: Math.max(2, s.total / sparkMax * 100) + "%",
+        background: isActive ? "linear-gradient(180deg,var(--lav-lt),var(--lav))" : "var(--border)",
+        borderRadius: "4px 4px 0 0",
+        transition: "height .3s"
+      }
+    }), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 9,
+        color: isActive ? "var(--lav-dk)" : "var(--text-lt)",
+        marginTop: 4,
+        fontWeight: isActive ? 700 : 500
+      }
+    }, s.label));
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "stats-grid"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "stat-card"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "stat-label"
+  }, "Ann\xE9e ", selectedYear), /*#__PURE__*/React.createElement("div", {
+    className: "stat-value"
+  }, fmtEuro(totalYear)), /*#__PURE__*/React.createElement("div", {
+    className: "stat-sub"
+  }, yearInv.length, " facture(s)")), /*#__PURE__*/React.createElement("div", {
+    className: "stat-card"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "stat-label"
+  }, "Soins r\xE9alis\xE9s en ", selectedYear), /*#__PURE__*/React.createElement("div", {
+    className: "stat-value"
+  }, soinsYear), /*#__PURE__*/React.createElement("div", {
+    className: "stat-sub"
+  }, "soin(s) effectu\xE9(s)")), /*#__PURE__*/React.createElement("div", {
+    className: "stat-card"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "stat-label"
+  }, "Client(e)s"), /*#__PURE__*/React.createElement("div", {
+    className: "stat-value"
+  }, clients.length), /*#__PURE__*/React.createElement("div", {
+    className: "stat-sub"
+  }, "enregistr\xE9(e)s")), /*#__PURE__*/React.createElement("div", {
+    className: "stat-card"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "stat-label"
+  }, "Meilleur mois \uD83C\uDFC6"), /*#__PURE__*/React.createElement("div", {
+    className: "stat-value"
+  }, fmtEuro(bestMonthTotal)), /*#__PURE__*/React.createElement("div", {
+    className: "stat-sub"
+  }, bestMonthLabel))), /*#__PURE__*/React.createElement("div", {
+    className: "card"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: 16
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "card-title",
+    style: {
+      marginBottom: 0
+    }
+  }, /*#__PURE__*/React.createElement(Lotus, {
+    size: 22
+  }), " Chiffre d'affaires ", selectedYear), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      alignItems: "center",
+      gap: 8
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-secondary btn-sm",
+    onClick: function () {
+      setSelectedYear(selectedYear - 1);
+    },
+    disabled: years.indexOf(selectedYear - 1) < 0 && selectedYear - 1 < Math.min.apply(null, years)
+  }, "\u25C0"), /*#__PURE__*/React.createElement("select", {
+    className: "form-select",
+    value: selectedYear,
+    onChange: function (e) {
+      setSelectedYear(parseInt(e.target.value));
+    },
+    style: {
+      width: 100,
+      padding: "6px 12px",
+      textAlign: "center",
+      borderRadius: 20
+    }
+  }, years.map(function (y) {
+    return /*#__PURE__*/React.createElement("option", {
+      key: y,
+      value: y
+    }, y);
+  })), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-secondary btn-sm",
+    onClick: function () {
+      setSelectedYear(selectedYear + 1);
+    },
+    disabled: selectedYear >= now.getFullYear()
+  }, "\u25B6"))), totalYear === 0 ? /*#__PURE__*/React.createElement("div", {
+    className: "empty-state"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "empty-icon"
+  }, "\u273F"), /*#__PURE__*/React.createElement("p", null, "Aucune facture en ", selectedYear)) : /*#__PURE__*/React.createElement("div", {
+    className: "chart-bar-wrap"
+  }, monthlyData.map(function (m, i) {
+    return /*#__PURE__*/React.createElement("div", {
+      className: "chart-col",
+      key: i
+    }, m.total > 0 && /*#__PURE__*/React.createElement("div", {
+      className: "chart-val"
+    }, m.total, "\u20AC"), /*#__PURE__*/React.createElement("div", {
+      className: "chart-bar",
+      style: {
+        height: m.total / maxMonth * 100 + "%"
+      }
+    }), /*#__PURE__*/React.createElement("div", {
+      className: "chart-label"
+    }, m.label));
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "card"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "card-title"
+  }, "Soins populaires"), topList.length === 0 ? /*#__PURE__*/React.createElement("div", {
+    className: "empty-state"
+  }, /*#__PURE__*/React.createElement("p", {
+    style: {
+      fontSize: 13
+    }
+  }, "Pas encore de donn\xE9es")) : /*#__PURE__*/React.createElement("div", {
+    className: "table-wrap"
+  }, /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "Soin"), /*#__PURE__*/React.createElement("th", null, "Nb"))), /*#__PURE__*/React.createElement("tbody", null, topList.map(function (e, i) {
+    return /*#__PURE__*/React.createElement("tr", {
+      key: i
+    }, /*#__PURE__*/React.createElement("td", null, e[0]), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("strong", null, e[1])));
+  }))))));
+}
+function ClientsPage({
+  clients,
+  setClients
+}) {
+  const [showModal, setShowModal] = useState(false);
+  const [editing, setEditing] = useState(null);
+  const [form, setForm] = useState({
+    name: "",
+    firstname: "",
+    phone: "",
+    email: "",
+    address: "",
+    birthday: "",
+    notes: ""
+  });
+  const [search, setSearch] = useState("");
+  var openNew = function () {
+    setForm({
+      name: "",
+      firstname: "",
+      phone: "",
+      email: "",
+      address: "",
+      birthday: "",
+      notes: ""
+    });
+    setEditing(null);
+    setShowModal(true);
+  };
+  var openEdit = function (c) {
+    setForm(Object.assign({
+      birthday: ""
+    }, c));
+    setEditing(c.id);
+    setShowModal(true);
+  };
+  var handleSave = async function () {
+    if (!form.name.trim()) return;
+    if (editing) {
+      var data = {
+        name: form.name,
+        firstname: form.firstname || "",
+        phone: form.phone,
+        email: form.email,
+        address: form.address,
+        birthday: form.birthday || "",
+        notes: form.notes
+      };
+      await fbUpdate("clients", editing, data);
+      setClients(clients.map(function (c) {
+        return c.id === editing ? Object.assign({}, c, form) : c;
+      }));
+    } else {
+      var d = {
+        name: form.name,
+        firstname: form.firstname || "",
+        phone: form.phone,
+        email: form.email,
+        address: form.address,
+        birthday: form.birthday || "",
+        notes: form.notes
+      };
+      var nc = await fbAdd("clients", d);
+      setClients(clients.concat([nc]));
+    }
+    setShowModal(false);
+  };
+  var handleDelete = async function (id) {
+    await fbDelete("clients", id);
+    setClients(clients.filter(function (c) {
+      return c.id !== id;
+    }));
+  };
+  var filtered = clients.filter(function (c) {
+    var q = search.toLowerCase();
+    return c.name.toLowerCase().indexOf(q) >= 0 || (c.firstname || "").toLowerCase().indexOf(q) >= 0 || (c.phone || "").indexOf(search) >= 0 || (c.email || "").toLowerCase().indexOf(q) >= 0;
+  });
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "page-header"
+  }, /*#__PURE__*/React.createElement("h2", null, "Gestion de la client\xE8le"), /*#__PURE__*/React.createElement("p", null, clients.length, " client(e)s enregistr\xE9(e)s")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 12,
+      marginBottom: 20,
+      flexWrap: "wrap"
+    }
+  }, /*#__PURE__*/React.createElement("input", {
+    className: "form-input",
+    placeholder: "Rechercher\u2026",
+    value: search,
+    onChange: function (e) {
+      setSearch(e.target.value);
+    },
+    style: {
+      maxWidth: 300
+    }
+  }), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-primary",
+    onClick: openNew
+  }, "\u273F Nouveau client")), /*#__PURE__*/React.createElement("div", {
+    className: "card"
+  }, filtered.length === 0 ? /*#__PURE__*/React.createElement("div", {
+    className: "empty-state"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "empty-icon"
+  }, "\u2740"), /*#__PURE__*/React.createElement("p", null, "Aucun(e) client(e) trouv\xE9(e)")) : /*#__PURE__*/React.createElement("div", {
+    className: "table-wrap"
+  }, /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "Nom"), /*#__PURE__*/React.createElement("th", null, "Pr\xE9nom"), /*#__PURE__*/React.createElement("th", null, "T\xE9l\xE9phone"), /*#__PURE__*/React.createElement("th", null, "Email"), /*#__PURE__*/React.createElement("th", null, "Adresse"), /*#__PURE__*/React.createElement("th", null))), /*#__PURE__*/React.createElement("tbody", null, filtered.map(function (c) {
+    return /*#__PURE__*/React.createElement("tr", {
+      key: c.id,
+      className: "clickable-row",
+      onClick: function () {
+        openEdit(c);
+      }
+    }, /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("strong", null, c.name)), /*#__PURE__*/React.createElement("td", null, c.firstname || "—"), /*#__PURE__*/React.createElement("td", null, c.phone || "—"), /*#__PURE__*/React.createElement("td", null, c.email || "—"), /*#__PURE__*/React.createElement("td", null, c.address || "—"), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("button", {
+      className: "btn btn-danger btn-sm",
+      onClick: function (e) {
+        e.stopPropagation();
+        handleDelete(c.id);
+      }
+    }, "\u2715")));
+  }))))), showModal && /*#__PURE__*/React.createElement("div", {
+    className: "modal-overlay",
+    onClick: function () {
+      setShowModal(false);
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "modal",
+    onClick: function (e) {
+      e.stopPropagation();
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "modal-header"
+  }, /*#__PURE__*/React.createElement("h3", null, editing ? "Modifier" : "Nouveau", " client(e)"), /*#__PURE__*/React.createElement("button", {
+    className: "modal-close",
+    onClick: function () {
+      setShowModal(false);
+    }
+  }, "\u2715")), /*#__PURE__*/React.createElement("div", {
+    className: "modal-body"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 12
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "form-group",
+    style: {
+      flex: 1
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "Nom *"), /*#__PURE__*/React.createElement("input", {
+    className: "form-input",
+    value: form.name,
+    onChange: function (e) {
+      setForm(Object.assign({}, form, {
+        name: e.target.value
+      }));
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "form-group",
+    style: {
+      flex: 1
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "Pr\xE9nom"), /*#__PURE__*/React.createElement("input", {
+    className: "form-input",
+    value: form.firstname,
+    onChange: function (e) {
+      setForm(Object.assign({}, form, {
+        firstname: e.target.value
+      }));
+    }
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "form-group"
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "T\xE9l\xE9phone"), /*#__PURE__*/React.createElement("input", {
+    className: "form-input",
+    value: form.phone,
+    onChange: function (e) {
+      setForm(Object.assign({}, form, {
+        phone: e.target.value
+      }));
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "form-group"
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "Email"), /*#__PURE__*/React.createElement("input", {
+    className: "form-input",
+    value: form.email,
+    onChange: function (e) {
+      setForm(Object.assign({}, form, {
+        email: e.target.value
+      }));
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 12
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "form-group",
+    style: {
+      flex: 1
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "Date de naissance"), /*#__PURE__*/React.createElement("input", {
+    className: "form-input",
+    type: "date",
+    value: form.birthday,
+    onChange: function (e) {
+      setForm(Object.assign({}, form, {
+        birthday: e.target.value
+      }));
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "form-group",
+    style: {
+      flex: 2
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "Adresse"), /*#__PURE__*/React.createElement("input", {
+    className: "form-input",
+    value: form.address,
+    onChange: function (e) {
+      setForm(Object.assign({}, form, {
+        address: e.target.value
+      }));
+    }
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "form-group"
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "Notes"), /*#__PURE__*/React.createElement("textarea", {
+    className: "form-textarea",
+    value: form.notes,
+    onChange: function (e) {
+      setForm(Object.assign({}, form, {
+        notes: e.target.value
+      }));
+    }
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "modal-footer"
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-secondary",
+    onClick: function () {
+      setShowModal(false);
+    }
+  }, "Annuler"), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-primary",
+    onClick: handleSave
+  }, "Enregistrer")))));
+}
+function ServicesPage({
+  services,
+  setServices
+}) {
+  const [showModal, setShowModal] = useState(false);
+  const [editing, setEditing] = useState(null);
+  const [form, setForm] = useState({
+    name: "",
+    duration: "",
+    price: "",
+    desc: ""
+  });
+  var openNew = function () {
+    setForm({
+      name: "",
+      duration: "",
+      price: "",
+      desc: ""
+    });
+    setEditing(null);
+    setShowModal(true);
+  };
+  var openEdit = function (s) {
+    setForm({
+      name: s.name,
+      duration: s.duration,
+      price: String(s.price),
+      desc: s.desc
+    });
+    setEditing(s.id);
+    setShowModal(true);
+  };
+  var handleSave = function () {
+    if (!form.name.trim() || !form.price) return;
+    var svcData = {
+      name: form.name.trim(),
+      duration: form.duration.trim(),
+      price: parseFloat(form.price) || 0,
+      desc: form.desc.trim()
+    };
+    var updated;
+    if (editing) {
+      updated = services.map(function (s) {
+        return s.id === editing ? Object.assign({}, s, svcData) : s;
+      });
+    } else {
+      var newId = Date.now();
+      updated = services.concat([Object.assign({
+        id: newId
+      }, svcData)]);
+    }
+    setServices(updated);
+    localSet("services", updated);
+    setShowModal(false);
+  };
+  var handleDelete = function (id) {
+    var updated = services.filter(function (s) {
+      return s.id !== id;
+    });
+    setServices(updated);
+    localSet("services", updated);
+  };
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "page-header"
+  }, /*#__PURE__*/React.createElement("h2", null, "Catalogue des soins"), /*#__PURE__*/React.createElement("p", null, services.length, " soin(s) propos\xE9(s)")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginBottom: 20
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-primary",
+    onClick: openNew
+  }, "\u273F Ajouter un soin")), /*#__PURE__*/React.createElement("div", {
+    className: "ornament-divider"
+  }, "\u273F"), /*#__PURE__*/React.createElement("div", {
+    className: "svc-grid"
+  }, services.map(function (s) {
+    return /*#__PURE__*/React.createElement("div", {
+      className: "svc-card",
+      key: s.id,
+      style: {
+        cursor: "pointer"
+      },
+      onClick: function () {
+        openEdit(s);
+      }
+    }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+      className: "svc-name"
+    }, s.name), /*#__PURE__*/React.createElement("div", {
+      className: "svc-desc"
+    }, s.desc)), /*#__PURE__*/React.createElement("div", {
+      className: "svc-footer"
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "svc-duration"
+    }, s.duration), /*#__PURE__*/React.createElement("span", {
+      className: "svc-price"
+    }, s.price, " \u20AC")), /*#__PURE__*/React.createElement("button", {
+      className: "btn btn-danger btn-sm",
+      style: {
+        position: "absolute",
+        top: 12,
+        right: 12
+      },
+      onClick: function (e) {
+        e.stopPropagation();
+        handleDelete(s.id);
+      }
+    }, "\u2715"));
+  })), showModal && /*#__PURE__*/React.createElement("div", {
+    className: "modal-overlay",
+    onClick: function () {
+      setShowModal(false);
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "modal",
+    onClick: function (e) {
+      e.stopPropagation();
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "modal-header"
+  }, /*#__PURE__*/React.createElement("h3", null, editing ? "Modifier" : "Ajouter", " un soin"), /*#__PURE__*/React.createElement("button", {
+    className: "modal-close",
+    onClick: function () {
+      setShowModal(false);
+    }
+  }, "\u2715")), /*#__PURE__*/React.createElement("div", {
+    className: "modal-body"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "form-group"
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "Nom du soin *"), /*#__PURE__*/React.createElement("input", {
+    className: "form-input",
+    value: form.name,
+    onChange: function (e) {
+      setForm(Object.assign({}, form, {
+        name: e.target.value
+      }));
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 12
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "form-group",
+    style: {
+      flex: 1
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "Dur\xE9e"), /*#__PURE__*/React.createElement("input", {
+    className: "form-input",
+    placeholder: "ex: 1h, 30 min",
+    value: form.duration,
+    onChange: function (e) {
+      setForm(Object.assign({}, form, {
+        duration: e.target.value
+      }));
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "form-group",
+    style: {
+      flex: 1
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "Prix (\u20AC) *"), /*#__PURE__*/React.createElement("input", {
+    className: "form-input",
+    type: "number",
+    value: form.price,
+    onChange: function (e) {
+      setForm(Object.assign({}, form, {
+        price: e.target.value
+      }));
+    }
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "form-group"
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "Description"), /*#__PURE__*/React.createElement("textarea", {
+    className: "form-textarea",
+    value: form.desc,
+    onChange: function (e) {
+      setForm(Object.assign({}, form, {
+        desc: e.target.value
+      }));
+    }
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "modal-footer"
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-secondary",
+    onClick: function () {
+      setShowModal(false);
+    }
+  }, "Annuler"), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-primary",
+    onClick: handleSave
+  }, "Enregistrer")))));
+}
+function InvoicesPage({
+  invoices,
+  setInvoices,
+  clients,
+  setClients,
+  services
+}) {
+  const [showForm, setShowForm] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [preview, setPreview] = useState(null);
+  const [search, setSearch] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
+  const [filterDateFrom, setFilterDateFrom] = useState("");
+  const [filterDateTo, setFilterDateTo] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [selClient, setSelClient] = useState("");
+  const [newName, setNewName] = useState("");
+  const [newFirstname, setNewFirstname] = useState("");
+  const [newPhone, setNewPhone] = useState("");
+  const [items, setItems] = useState([]);
+  const [payMethod, setPayMethod] = useState("Espèces");
+  const [paid, setPaid] = useState(true);
+  const [note, setNote] = useState("");
+  const [invDate, setInvDate] = useState("");
+  var today = new Date().toISOString().slice(0, 10);
+  var resetForm = function () {
+    setSelClient("");
+    setNewName("");
+    setNewFirstname("");
+    setNewPhone("");
+    setItems([]);
+    setPayMethod("Espèces");
+    setPaid(true);
+    setNote("");
+    setInvDate(today);
+    setEditingId(null);
+  };
+  var openNew = function () {
+    resetForm();
+    setShowForm(true);
+  };
+  var openEdit = function (inv) {
+    setEditingId(inv.id);
+    setSelClient(inv.client.id || "");
+    setItems((inv.items || []).map(function (it, i) {
+      var svc = services.find(function (s) {
+        return s.name === it.name;
+      });
+      return {
+        id: svc ? svc.id : Date.now() + i,
+        name: it.name,
+        duration: it.duration,
+        price: it.price,
+        qty: it.qty || 1
+      };
+    }));
+    setPayMethod(inv.payMethod || "Espèces");
+    setPaid(inv.paid !== false);
+    setNote(inv.note || "");
+    setInvDate(inv.date ? inv.date.slice(0, 10) : "");
+    setPreview(null);
+    setShowForm(true);
+  };
+  var toggleSvc = function (svc) {
+    var idx = items.findIndex(function (i) {
+      return i.id === svc.id;
+    });
+    if (idx >= 0) setItems(items.filter(function (i) {
+      return i.id !== svc.id;
+    }));else setItems(items.concat([Object.assign({}, svc, {
+      qty: 1
+    })]));
+  };
+  var updateQty = function (id, d) {
+    setItems(items.map(function (i) {
+      return i.id === id ? Object.assign({}, i, {
+        qty: Math.max(1, i.qty + d)
+      }) : i;
+    }));
+  };
+  var total = items.reduce(function (s, i) {
+    return s + i.price * i.qty;
+  }, 0);
+  var handleSave = async function () {
+    var clientObj;
+    if (selClient === "__new__") {
+      if (!newName.trim()) return;
+      clientObj = await fbAdd("clients", {
+        name: newName.trim(),
+        firstname: newFirstname.trim(),
+        phone: newPhone.trim(),
+        email: "",
+        address: "",
+        notes: ""
+      });
+      setClients(clients.concat([clientObj]));
+    } else {
+      clientObj = clients.find(function (c) {
+        return c.id === selClient;
+      });
+      if (!clientObj) return;
+    }
+    if (items.length === 0) return;
+    var invItems = items.map(function (i) {
+      return {
+        name: i.name,
+        duration: i.duration,
+        price: i.price,
+        qty: i.qty
+      };
+    });
+    var clientData = {
+      id: clientObj.id,
+      name: clientObj.name,
+      firstname: clientObj.firstname || "",
+      phone: clientObj.phone || "",
+      address: clientObj.address || ""
+    };
+    if (editingId) {
+      var updateData = {
+        client: clientData,
+        items: invItems,
+        total: total,
+        paid: paid,
+        payMethod: payMethod,
+        note: note
+      };
+      if (invDate) updateData.date = new Date(invDate).toISOString();
+      await fbUpdate("invoices", editingId, updateData);
+      var updatedInv = invoices.map(function (i) {
+        return i.id === editingId ? Object.assign({}, i, updateData) : i;
+      });
+      setInvoices(updatedInv);
+      setShowForm(false);
+      var edited = updatedInv.find(function (i) {
+        return i.id === editingId;
+      });
+      if (edited) setPreview(edited);
+    } else {
+      var invData = {
+        number: genNum(invoices),
+        date: invDate ? new Date(invDate).toISOString() : new Date().toISOString(),
+        client: clientData,
+        items: invItems,
+        total: total,
+        paid: paid,
+        payMethod: payMethod,
+        note: note
+      };
+      var newInv = await fbAdd("invoices", invData);
+      setInvoices([newInv].concat(invoices));
+      setShowForm(false);
+      setPreview(newInv);
+    }
+    resetForm();
+  };
+  var togglePaid = async function (inv) {
+    await fbUpdate("invoices", inv.id, {
+      paid: !inv.paid
+    });
+    setInvoices(invoices.map(function (i) {
+      return i.id === inv.id ? Object.assign({}, i, {
+        paid: !i.paid
+      }) : i;
+    }));
+  };
+  var deleteInv = async function (id) {
+    await fbDelete("invoices", id);
+    setInvoices(invoices.filter(function (i) {
+      return i.id !== id;
+    }));
+  };
+  var filtered = invoices.filter(function (i) {
+    var q = search.toLowerCase();
+    var matchText = !q || i.number.toLowerCase().indexOf(q) >= 0 || i.client.name.toLowerCase().indexOf(q) >= 0 || (i.client.firstname || "").toLowerCase().indexOf(q) >= 0 || (i.payMethod || "").toLowerCase().indexOf(q) >= 0 || (i.note || "").toLowerCase().indexOf(q) >= 0;
+    var matchStatus = filterStatus === "all" || filterStatus === "paid" && i.paid || filterStatus === "pending" && !i.paid;
+    var iDate = (i.date || "").slice(0, 10);
+    var matchFrom = !filterDateFrom || iDate >= filterDateFrom;
+    var matchTo = !filterDateTo || iDate <= filterDateTo;
+    return matchText && matchStatus && matchFrom && matchTo;
+  });
+  var filteredTotal = filtered.reduce(function (s, i) {
+    return s + i.total;
+  }, 0);
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "page-header"
+  }, /*#__PURE__*/React.createElement("h2", null, "Factures"), /*#__PURE__*/React.createElement("p", null, invoices.length, " facture(s) au total")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginBottom: 20
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-primary",
+    onClick: openNew,
+    style: {
+      width: "100%",
+      padding: "18px 28px",
+      fontSize: 17,
+      fontWeight: 700,
+      borderRadius: 16,
+      boxShadow: "0 4px 20px rgba(139,124,184,.35)",
+      letterSpacing: ".02em"
+    }
+  }, "\u273F Nouvelle facture")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginBottom: 16
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-secondary",
+    onClick: function () {
+      setShowFilters(!showFilters);
+    },
+    style: {
+      fontSize: 12,
+      gap: 6
+    }
+  }, /*#__PURE__*/React.createElement("span", null, showFilters ? "▼" : "▶"), " Recherche & filtres", (search || filterDateFrom || filterDateTo || filterStatus !== "all") && /*#__PURE__*/React.createElement("span", {
+    style: {
+      background: "var(--lav)",
+      color: "#fff",
+      borderRadius: 10,
+      padding: "1px 8px",
+      fontSize: 10,
+      marginLeft: 4
+    }
+  }, "actif"))), showFilters && /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      padding: 16,
+      marginBottom: 16
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 12,
+      flexWrap: "wrap",
+      alignItems: "flex-end"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: "1 1 200px"
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "Recherche"), /*#__PURE__*/React.createElement("input", {
+    className: "form-input",
+    placeholder: "Nom, n\xB0 facture, note\u2026",
+    value: search,
+    onChange: function (e) {
+      setSearch(e.target.value);
+    }
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "Du"), /*#__PURE__*/React.createElement("input", {
+    className: "form-input",
+    type: "date",
+    value: filterDateFrom,
+    onChange: function (e) {
+      setFilterDateFrom(e.target.value);
+    },
+    style: {
+      width: 160
+    }
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "Au"), /*#__PURE__*/React.createElement("input", {
+    className: "form-input",
+    type: "date",
+    value: filterDateTo,
+    onChange: function (e) {
+      setFilterDateTo(e.target.value);
+    },
+    style: {
+      width: 160
+    }
+  })), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "Statut"), /*#__PURE__*/React.createElement("select", {
+    className: "form-select",
+    value: filterStatus,
+    onChange: function (e) {
+      setFilterStatus(e.target.value);
+    },
+    style: {
+      width: 140
+    }
+  }, /*#__PURE__*/React.createElement("option", {
+    value: "all"
+  }, "Toutes"), /*#__PURE__*/React.createElement("option", {
+    value: "paid"
+  }, "Pay\xE9es"), /*#__PURE__*/React.createElement("option", {
+    value: "pending"
+  }, "En attente")))), (search || filterDateFrom || filterDateTo || filterStatus !== "all") && /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 12,
+      fontSize: 13,
+      color: "var(--text-mid)",
+      fontWeight: 600
+    }
+  }, filtered.length, " r\xE9sultat(s) \u2014 Total : ", fmtEuro(filteredTotal), /*#__PURE__*/React.createElement("button", {
+    style: {
+      marginLeft: 12,
+      background: "none",
+      border: "none",
+      color: "var(--lav)",
+      cursor: "pointer",
+      fontWeight: 700,
+      fontFamily: "'Quicksand',sans-serif",
+      fontSize: 12
+    },
+    onClick: function () {
+      setSearch("");
+      setFilterDateFrom("");
+      setFilterDateTo("");
+      setFilterStatus("all");
+    }
+  }, "R\xE9initialiser"))), /*#__PURE__*/React.createElement("div", {
+    className: "card"
+  }, filtered.length === 0 ? /*#__PURE__*/React.createElement("div", {
+    className: "empty-state"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "empty-icon"
+  }, "\u274B"), /*#__PURE__*/React.createElement("p", null, "Aucune facture")) : /*#__PURE__*/React.createElement("div", {
+    className: "table-wrap"
+  }, /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "N\xB0"), /*#__PURE__*/React.createElement("th", null, "Date"), /*#__PURE__*/React.createElement("th", null, "Client(e)"), /*#__PURE__*/React.createElement("th", null, "Montant"), /*#__PURE__*/React.createElement("th", null, "Statut"), /*#__PURE__*/React.createElement("th", null))), /*#__PURE__*/React.createElement("tbody", null, filtered.map(function (inv) {
+    return /*#__PURE__*/React.createElement("tr", {
+      key: inv.id,
+      className: "clickable-row",
+      onClick: function () {
+        setPreview(inv);
+      }
+    }, /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("strong", null, inv.number)), /*#__PURE__*/React.createElement("td", null, fmtDate(inv.date)), /*#__PURE__*/React.createElement("td", null, inv.client.name, inv.client.firstname ? " " + inv.client.firstname : ""), /*#__PURE__*/React.createElement("td", {
+      style: {
+        fontWeight: 700
+      }
+    }, fmtEuro(inv.total)), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("span", {
+      className: "badge " + (inv.paid ? "badge-paid" : "badge-pending"),
+      onClick: function (e) {
+        e.stopPropagation();
+        togglePaid(inv);
+      },
+      style: {
+        cursor: "pointer"
+      }
+    }, inv.paid ? "Payée" : "En attente")), /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("button", {
+      className: "btn btn-danger btn-sm",
+      onClick: function (e) {
+        e.stopPropagation();
+        deleteInv(inv.id);
+      }
+    }, "\u2715")));
+  }))))), showForm && /*#__PURE__*/React.createElement("div", {
+    className: "modal-overlay",
+    onClick: function () {
+      setShowForm(false);
+      resetForm();
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "modal",
+    style: {
+      maxWidth: 650
+    },
+    onClick: function (e) {
+      e.stopPropagation();
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "modal-header"
+  }, /*#__PURE__*/React.createElement("h3", null, editingId ? "Modifier la facture" : "Nouvelle facture"), /*#__PURE__*/React.createElement("button", {
+    className: "modal-close",
+    onClick: function () {
+      setShowForm(false);
+      resetForm();
+    }
+  }, "\u2715")), /*#__PURE__*/React.createElement("div", {
+    className: "modal-body"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 12
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "form-group",
+    style: {
+      flex: 2
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "Client(e) *"), /*#__PURE__*/React.createElement("select", {
+    className: "form-select",
+    value: selClient,
+    onChange: function (e) {
+      setSelClient(e.target.value);
+    }
+  }, /*#__PURE__*/React.createElement("option", {
+    value: ""
+  }, "\u2014 Choisir \u2014"), clients.map(function (c) {
+    return /*#__PURE__*/React.createElement("option", {
+      key: c.id,
+      value: c.id
+    }, c.name, c.firstname ? " " + c.firstname : "");
+  }), /*#__PURE__*/React.createElement("option", {
+    value: "__new__"
+  }, "+ Nouveau client"))), /*#__PURE__*/React.createElement("div", {
+    className: "form-group",
+    style: {
+      flex: 1
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "Date"), /*#__PURE__*/React.createElement("input", {
+    className: "form-input",
+    type: "date",
+    value: invDate,
+    onChange: function (e) {
+      setInvDate(e.target.value);
+    }
+  }))), selClient === "__new__" && /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 12,
+      flexWrap: "wrap"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "form-group",
+    style: {
+      flex: 1
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "Nom *"), /*#__PURE__*/React.createElement("input", {
+    className: "form-input",
+    value: newName,
+    onChange: function (e) {
+      setNewName(e.target.value);
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "form-group",
+    style: {
+      flex: 1
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "Pr\xE9nom"), /*#__PURE__*/React.createElement("input", {
+    className: "form-input",
+    value: newFirstname,
+    onChange: function (e) {
+      setNewFirstname(e.target.value);
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "form-group",
+    style: {
+      flex: 1
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "T\xE9l\xE9phone"), /*#__PURE__*/React.createElement("input", {
+    className: "form-input",
+    value: newPhone,
+    onChange: function (e) {
+      setNewPhone(e.target.value);
+    }
+  }))), /*#__PURE__*/React.createElement("label", {
+    className: "form-label",
+    style: {
+      marginTop: 8
+    }
+  }, "Soins *"), services.map(function (svc) {
+    var sel = items.find(function (i) {
+      return i.id === svc.id;
+    });
+    return /*#__PURE__*/React.createElement("div", {
+      key: svc.id,
+      className: "service-option" + (sel ? " selected" : ""),
+      onClick: function () {
+        toggleSvc(svc);
+      }
+    }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+      className: "service-name"
+    }, svc.name), /*#__PURE__*/React.createElement("div", {
+      className: "service-detail"
+    }, svc.duration), sel && /*#__PURE__*/React.createElement("div", {
+      className: "qty-ctrl",
+      onClick: function (e) {
+        e.stopPropagation();
+      }
+    }, /*#__PURE__*/React.createElement("button", {
+      className: "qty-btn",
+      onClick: function () {
+        updateQty(svc.id, -1);
+      }
+    }, "\u2212"), /*#__PURE__*/React.createElement("span", {
+      className: "qty-val"
+    }, sel.qty), /*#__PURE__*/React.createElement("button", {
+      className: "qty-btn",
+      onClick: function () {
+        updateQty(svc.id, 1);
+      }
+    }, "+"))), /*#__PURE__*/React.createElement("div", {
+      className: "service-price"
+    }, svc.price, " \u20AC"));
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 12,
+      marginTop: 16
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "form-group",
+    style: {
+      flex: 1
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "Paiement"), /*#__PURE__*/React.createElement("select", {
+    className: "form-select",
+    value: payMethod,
+    onChange: function (e) {
+      setPayMethod(e.target.value);
+    }
+  }, /*#__PURE__*/React.createElement("option", null, "Esp\xE8ces"), /*#__PURE__*/React.createElement("option", null, "Ch\xE8que"), /*#__PURE__*/React.createElement("option", null, "Carte bancaire"), /*#__PURE__*/React.createElement("option", null, "Virement"))), /*#__PURE__*/React.createElement("div", {
+    className: "form-group",
+    style: {
+      flex: 1
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "Statut"), /*#__PURE__*/React.createElement("select", {
+    className: "form-select",
+    value: paid ? "paid" : "pending",
+    onChange: function (e) {
+      setPaid(e.target.value === "paid");
+    }
+  }, /*#__PURE__*/React.createElement("option", {
+    value: "paid"
+  }, "Pay\xE9e"), /*#__PURE__*/React.createElement("option", {
+    value: "pending"
+  }, "En attente")))), /*#__PURE__*/React.createElement("div", {
+    className: "form-group"
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "Note (optionnel)"), /*#__PURE__*/React.createElement("textarea", {
+    className: "form-textarea",
+    value: note,
+    onChange: function (e) {
+      setNote(e.target.value);
+    },
+    style: {
+      minHeight: 50
+    }
+  })), items.length > 0 && /*#__PURE__*/React.createElement("div", {
+    style: {
+      textAlign: "right",
+      marginTop: 8,
+      paddingTop: 14,
+      borderTop: "2px solid var(--lav)"
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 11,
+      color: "var(--text-lt)",
+      marginRight: 14,
+      fontWeight: 700,
+      textTransform: "uppercase",
+      letterSpacing: ".06em"
+    }
+  }, "Total"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontFamily: "'Cormorant Garamond',serif",
+      fontSize: 28,
+      fontWeight: 700,
+      color: "var(--lav-dk)"
+    }
+  }, fmtEuro(total)))), /*#__PURE__*/React.createElement("div", {
+    className: "modal-footer"
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-secondary",
+    onClick: function () {
+      setShowForm(false);
+      resetForm();
+    }
+  }, "Annuler"), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-primary",
+    onClick: handleSave,
+    disabled: items.length === 0 || !selClient
+  }, editingId ? "Enregistrer" : "Créer la facture")))), preview && /*#__PURE__*/React.createElement("div", {
+    className: "modal-overlay",
+    onClick: function () {
+      setPreview(null);
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "modal",
+    style: {
+      maxWidth: 650
+    },
+    onClick: function (e) {
+      e.stopPropagation();
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "modal-header"
+  }, /*#__PURE__*/React.createElement("h3", null, "Facture ", preview.number), /*#__PURE__*/React.createElement("button", {
+    className: "modal-close",
+    onClick: function () {
+      setPreview(null);
+    }
+  }, "\u2715")), /*#__PURE__*/React.createElement("div", {
+    className: "modal-body"
+  }, /*#__PURE__*/React.createElement(InvoicePreview, {
+    inv: preview
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "modal-footer"
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-danger",
+    onClick: function () {
+      deleteInv(preview.id);
+      setPreview(null);
+    }
+  }, "Supprimer"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: 1
+    }
+  }), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-secondary",
+    onClick: function () {
+      openEdit(preview);
+    }
+  }, "Modifier"), preview.client && /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-secondary",
+    onClick: function () {
+      var to = "";
+      var c = clients.find(function (cl) {
+        return cl.id === preview.client.id;
+      });
+      if (c && c.email) to = c.email;
+      var lignes = preview.items.map(function (it) {
+        return "- " + it.name + " (" + it.duration + ") x" + (it.qty || 1) + " : " + (it.price * (it.qty || 1)).toFixed(2) + " EUR";
+      }).join("\n");
+      var body = "Bonjour " + (preview.client.firstname || preview.client.name) + ",\n\nVoici votre facture :\n\n" + "═══════════════════════════════════\n" + "FACTURE N. " + preview.number + "\n" + "Date : " + fmtDate(preview.date) + "\n" + "═══════════════════════════════════\n\n" + "Emise par :\n" + CAB.owner + "\n" + CAB.title + "\n" + CAB.address + "\n" + CAB.city + "\n" + "Tel : " + CAB.phone + "\n" + "Mail : " + CAB.email + "\n" + "SIRET : " + CAB.siret + "\n" + "Code APE : " + CAB.ape + "\n\n" + "Client(e) : " + preview.client.name + (preview.client.firstname ? " " + preview.client.firstname : "") + "\n" + (preview.client.phone ? "Tel : " + preview.client.phone + "\n" : "") + (preview.client.address ? "Adresse : " + preview.client.address + "\n" : "") + "\n" + "───────────────────────────────────\n" + "Prestations :\n" + lignes + "\n" + "───────────────────────────────────\n" + "TOTAL : " + fmtEuro(preview.total) + "\n" + (preview.payMethod ? "Mode de paiement : " + preview.payMethod + "\n" : "") + (preview.paid ? "Statut : Payee\n" : "Statut : En attente\n") + "\n" + "TVA non applicable, article 293 B du CGI\n" + CAB.legal + "\n" + "═══════════════════════════════════\n\n" + "Cordialement,\nGeorgiana Villemot\nTel : " + CAB.phone;
+      window.open("mailto:" + to + "?subject=" + encodeURIComponent("Facture " + preview.number + " - " + CAB.name) + "&body=" + encodeURIComponent(body));
+    }
+  }, "\uD83D\uDCE7 Envoyer par mail"), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-primary",
+    onClick: function () {
+      doPrint(preview);
+    }
+  }, "Imprimer / PDF")))));
+}
+function InvoicePreview({
+  inv
+}) {
+  return /*#__PURE__*/React.createElement("div", {
+    className: "invoice-preview"
+  }, /*#__PURE__*/React.createElement(SwirlCorner, {
+    style: {
+      top: -5,
+      left: -5
+    }
+  }), /*#__PURE__*/React.createElement(SwirlCorner, {
+    style: {
+      top: -5,
+      right: -5
+    },
+    flip: true
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      textAlign: "center",
+      marginBottom: 28
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: "'Cormorant Garamond',serif",
+      fontSize: 24,
+      fontWeight: 700,
+      color: "var(--lav-dk)"
+    }
+  }, "Facture"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: "var(--text-lt)",
+      marginTop: 4
+    }
+  }, inv.number)), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      marginBottom: 28
+    }
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      textTransform: "uppercase",
+      letterSpacing: ".08em",
+      color: "var(--lav)",
+      fontWeight: 700,
+      marginBottom: 8
+    }
+  }, "Factur\xE9 par"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontWeight: 600,
+      fontSize: 14
+    }
+  }, CAB.owner), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: "var(--lav-dk)",
+      fontStyle: "italic",
+      marginBottom: 4
+    }
+  }, CAB.title), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: "var(--text-lt)",
+      lineHeight: 1.7
+    }
+  }, CAB.address, /*#__PURE__*/React.createElement("br", null), CAB.city, /*#__PURE__*/React.createElement("br", null), "T\xE9l : ", CAB.phone, /*#__PURE__*/React.createElement("br", null), "Mail : ", CAB.email), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      color: "var(--text-lt)",
+      lineHeight: 1.7,
+      marginTop: 8
+    }
+  }, "SIRET : ", CAB.siret, /*#__PURE__*/React.createElement("br", null), "Code APE : ", CAB.ape, /*#__PURE__*/React.createElement("br", null), CAB.legal)), /*#__PURE__*/React.createElement("div", {
+    style: {
+      textAlign: "right"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      textTransform: "uppercase",
+      letterSpacing: ".08em",
+      color: "var(--lav)",
+      fontWeight: 700,
+      marginBottom: 8
+    }
+  }, "Factur\xE9 \xE0"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontWeight: 600,
+      fontSize: 14
+    }
+  }, inv.client.name, inv.client.firstname ? " " + inv.client.firstname : ""), inv.client.phone && /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: "var(--text-lt)"
+    }
+  }, inv.client.phone), inv.client.address && /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: "var(--text-lt)"
+    }
+  }, inv.client.address))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      justifyContent: "space-between",
+      marginBottom: 20,
+      paddingBottom: 12,
+      borderBottom: "2px solid var(--lav-bg)"
+    }
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 11,
+      textTransform: "uppercase",
+      letterSpacing: ".06em",
+      color: "var(--text-lt)",
+      fontWeight: 700
+    }
+  }, "Date : "), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 13,
+      fontWeight: 500
+    }
+  }, fmtDate(inv.date))), inv.payMethod && /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 11,
+      textTransform: "uppercase",
+      letterSpacing: ".06em",
+      color: "var(--text-lt)",
+      fontWeight: 700
+    }
+  }, "Mode paiement : "), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 13,
+      fontWeight: 500
+    }
+  }, inv.payMethod))), /*#__PURE__*/React.createElement("table", null, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "Prestation"), /*#__PURE__*/React.createElement("th", null, "Dur\xE9e"), /*#__PURE__*/React.createElement("th", null, "Qt\xE9"), /*#__PURE__*/React.createElement("th", {
+    style: {
+      textAlign: "right"
+    }
+  }, "Prix"))), /*#__PURE__*/React.createElement("tbody", null, inv.items.map(function (it, i) {
+    return /*#__PURE__*/React.createElement("tr", {
+      key: i
+    }, /*#__PURE__*/React.createElement("td", null, it.name), /*#__PURE__*/React.createElement("td", null, it.duration), /*#__PURE__*/React.createElement("td", null, it.qty || 1), /*#__PURE__*/React.createElement("td", {
+      style: {
+        textAlign: "right",
+        fontWeight: 600
+      }
+    }, fmtEuro(it.price * (it.qty || 1))));
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "invoice-total-row"
+  }, /*#__PURE__*/React.createElement("span", {
+    className: "invoice-total-label"
+  }, "Total"), /*#__PURE__*/React.createElement("span", {
+    className: "invoice-total-value"
+  }, fmtEuro(inv.total))), inv.paid !== undefined && /*#__PURE__*/React.createElement("div", {
+    style: {
+      textAlign: "right",
+      fontSize: 12,
+      color: "var(--text-lt)",
+      marginTop: 8,
+      fontWeight: 500
+    }
+  }, inv.paid ? "Payée" : "En attente de paiement"), inv.note && /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: "var(--text-lt)",
+      marginTop: 12,
+      fontStyle: "italic"
+    }
+  }, "Note : ", inv.note), /*#__PURE__*/React.createElement("div", {
+    className: "invoice-footer-note"
+  }, CAB.owner, " \u2014 SIRET : ", CAB.siret, " \u2014 Code APE : ", CAB.ape, /*#__PURE__*/React.createElement("br", null), CAB.address, ", ", CAB.city, " \u2014 T\xE9l : ", CAB.phone, /*#__PURE__*/React.createElement("br", null), "TVA non applicable, article 293 B du CGI"), /*#__PURE__*/React.createElement(SwirlCorner, {
+    style: {
+      bottom: -5,
+      left: -5,
+      transform: "scaleY(-1)"
+    }
+  }), /*#__PURE__*/React.createElement(SwirlCorner, {
+    style: {
+      bottom: -5,
+      right: -5,
+      transform: "scale(-1,-1)"
+    }
+  }));
+}
+
+// ═══════════════ APP ═══════════════
+
+function BonCadeauPage({
+  clients,
+  setClients,
+  invoices,
+  setInvoices,
+  services
+}) {
+  const [beneficiaire, setBeneficiaire] = useState("");
+  const [dateDebut, setDateDebut] = useState(new Date().toISOString().slice(0, 10));
+  const [message, setMessage] = useState("");
+  const [soinChoisi, setSoinChoisi] = useState(services.length > 0 ? services[0].name : "");
+  const [selAcheteur, setSelAcheteur] = useState("");
+  const [newAcheteurName, setNewAcheteurName] = useState("");
+  const [newAcheteurFirstname, setNewAcheteurFirstname] = useState("");
+  const [newAcheteurPhone, setNewAcheteurPhone] = useState("");
+  const [prixBon, setPrixBon] = useState(services.length > 0 ? String(services[0].price) : "55");
+  const [dureeValidite, setDureeValidite] = useState(3);
+  const [payMethod, setPayMethod] = useState("Espèces");
+  const [factureCreee, setFactureCreee] = useState(null);
+  var dateObj = new Date(dateDebut);
+  var dateFin = new Date(dateObj);
+  dateFin.setMonth(dateFin.getMonth() + dureeValidite);
+  var dateFinStr = dateFin.toLocaleDateString("fr-FR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  });
+  var dateDebutStr = dateObj.toLocaleDateString("fr-FR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  });
+  var doPrintBon = function () {
+    var h = ["<!DOCTYPE html><html><head><meta charset='utf-8'><title>Bon cadeau</title>", "<link href='https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Quicksand:wght@400;500;600;700&display=swap' rel='stylesheet'>", "<style>", "@page{size:A4;margin:20mm}", "*{margin:0;padding:0;box-sizing:border-box}", "body{font-family:'Quicksand',sans-serif;color:#3E3650;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#fff}", ".bon{width:700px;padding:50px 60px;text-align:center;position:relative;border:2px solid #E8E0F0;border-radius:20px}", ".bon-title{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:700;color:#6B5A9E;margin-bottom:8px}", ".bon-subtitle{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;color:#8B7CB8;font-style:italic;margin-bottom:30px}", ".bon-beneficiaire{font-size:16px;font-weight:600;color:#3E3650;margin-bottom:30px}", ".bon-lotus{margin:30px auto}", ".bon-validite{font-size:14px;color:#6B617E;margin:30px 0 10px}", ".bon-dates{font-size:13px;color:#9D93AE;margin-bottom:30px}", ".bon-message-label{font-size:12px;color:#9D93AE;text-align:left;margin-bottom:6px;font-weight:600}", ".bon-message{font-size:14px;color:#3E3650;font-style:italic;text-align:left;min-height:60px;padding:12px 16px;border:1px solid #E8E0F0;border-radius:10px;margin-bottom:30px}", ".bon-footer{border-top:1px solid #E8E0F0;padding-top:20px;display:flex;align-items:center;justify-content:center;gap:20px}", ".bon-footer-logo{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;font-style:italic;color:#8B7CB8}", ".bon-footer-info{font-size:11px;color:#9D93AE;line-height:1.6;text-align:left}", ".corner{position:absolute;width:80px;height:80px;opacity:.12}", ".corner svg{width:100%;height:100%}", ".c-tl{top:10px;left:10px}.c-tr{top:10px;right:10px;transform:scaleX(-1)}.c-bl{bottom:10px;left:10px;transform:scaleY(-1)}.c-br{bottom:10px;right:10px;transform:scale(-1,-1)}", "</style></head><body>", "<div class='bon'>", "<div class='corner c-tl'><svg viewBox='0 0 120 120'><path d='M10,110 Q10,60 40,40 Q60,25 80,30 Q95,34 90,50 Q85,65 70,60' fill='none' stroke='#8B7CB8' stroke-width='2.5'/><path d='M5,95 Q15,80 30,75 Q42,71 48,78 Q52,84 44,88' fill='none' stroke='#C4B0E0' stroke-width='1.8'/></svg></div>", "<div class='corner c-tr'><svg viewBox='0 0 120 120'><path d='M10,110 Q10,60 40,40 Q60,25 80,30 Q95,34 90,50 Q85,65 70,60' fill='none' stroke='#8B7CB8' stroke-width='2.5'/><path d='M5,95 Q15,80 30,75 Q42,71 48,78 Q52,84 44,88' fill='none' stroke='#C4B0E0' stroke-width='1.8'/></svg></div>", "<div class='corner c-bl'><svg viewBox='0 0 120 120'><path d='M10,110 Q10,60 40,40 Q60,25 80,30 Q95,34 90,50 Q85,65 70,60' fill='none' stroke='#8B7CB8' stroke-width='2.5'/><path d='M5,95 Q15,80 30,75 Q42,71 48,78 Q52,84 44,88' fill='none' stroke='#C4B0E0' stroke-width='1.8'/></svg></div>", "<div class='corner c-br'><svg viewBox='0 0 120 120'><path d='M10,110 Q10,60 40,40 Q60,25 80,30 Q95,34 90,50 Q85,65 70,60' fill='none' stroke='#8B7CB8' stroke-width='2.5'/><path d='M5,95 Q15,80 30,75 Q42,71 48,78 Q52,84 44,88' fill='none' stroke='#C4B0E0' stroke-width='1.8'/></svg></div>", "<div class='bon-title'>Bon cadeau</div>", "<div class='bon-subtitle'>pour " + soinChoisi + "</div>", beneficiaire ? "<div class='bon-beneficiaire'>Offert à : " + beneficiaire + "</div>" : "", "<div class='bon-lotus'><svg viewBox='0 0 200 160' width='140' height='112'><ellipse cx='100' cy='110' rx='24' ry='44' fill='#D4A0C0' opacity='.2' transform='rotate(-25 100 110)'/><ellipse cx='100' cy='110' rx='24' ry='44' fill='#D4A0C0' opacity='.2' transform='rotate(25 100 110)'/><ellipse cx='100' cy='104' rx='20' ry='48' fill='#E8B0D0' opacity='.25'/><ellipse cx='76' cy='116' rx='18' ry='36' fill='#D4A0C0' opacity='.15' transform='rotate(-40 76 116)'/><ellipse cx='124' cy='116' rx='18' ry='36' fill='#D4A0C0' opacity='.15' transform='rotate(40 124 116)'/><ellipse cx='100' cy='100' rx='14' ry='36' fill='#E8B0D0' opacity='.35'/><circle cx='100' cy='84' r='8' fill='#D4A843' opacity='.5'/></svg></div>", "<div class='bon-validite'>Valable " + dureeValidite + " mois à partir du <strong>" + dateDebutStr + "</strong></div>", "<div class='bon-dates'>Date limite : " + dateFinStr + "</div>", message ? "<div class='bon-message-label'>Message :</div><div class='bon-message'>" + message + "</div>" : "<div class='bon-message-label'>Message :</div><div class='bon-message'>&nbsp;</div>", "<div class='bon-footer'>", "<svg viewBox='0 0 100 80' width='40' height='32'><ellipse cx='50' cy='55' rx='12' ry='22' fill='#8B7CB8' opacity='.25' transform='rotate(-25 50 55)'/><ellipse cx='50' cy='55' rx='12' ry='22' fill='#8B7CB8' opacity='.25' transform='rotate(25 50 55)'/><ellipse cx='50' cy='52' rx='10' ry='24' fill='#8B7CB8' opacity='.3'/><ellipse cx='50' cy='50' rx='7' ry='18' fill='#8B7CB8' opacity='.45'/><circle cx='50' cy='42' r='4' fill='#D4A843' opacity='.6'/></svg>", "<div><div class='bon-footer-logo'>Réflexologie et Thérapie Manuelle</div><div class='bon-footer-info'>VILLEMOT Georgiana<br>" + CAB.address + "<br>" + CAB.city + "<br>" + CAB.phone + "</div></div>", "</div>", "</div>", "</body></html>"].join("\n");
+    var w = window.open("", "_blank");
+    if (w) {
+      w.document.write(h);
+      w.document.close();
+      setTimeout(function () {
+        w.print();
+      }, 500);
+    }
+  };
+  var handleFacturer = async function () {
+    var acheteur;
+    if (selAcheteur === "__new__") {
+      if (!newAcheteurName.trim()) return;
+      acheteur = await fbAdd("clients", {
+        name: newAcheteurName.trim(),
+        firstname: newAcheteurFirstname.trim(),
+        phone: newAcheteurPhone.trim(),
+        email: "",
+        address: "",
+        notes: ""
+      });
+      setClients(clients.concat([acheteur]));
+    } else {
+      acheteur = clients.find(function (c) {
+        return c.id === selAcheteur;
+      });
+      if (!acheteur) return;
+    }
+    var prix = parseFloat(prixBon) || 0;
+    var invData = {
+      number: genNum(invoices),
+      date: new Date(dateDebut).toISOString(),
+      client: {
+        id: acheteur.id,
+        name: acheteur.name,
+        firstname: acheteur.firstname || "",
+        phone: acheteur.phone || "",
+        address: acheteur.address || ""
+      },
+      items: [{
+        name: "Bon cadeau — " + soinChoisi,
+        duration: "—",
+        price: prix,
+        qty: 1
+      }],
+      total: prix,
+      paid: true,
+      payMethod: payMethod,
+      note: "Bon cadeau" + (beneficiaire ? " pour " + beneficiaire : "") + " — Valable jusqu'au " + dateFinStr
+    };
+    var newInv = await fbAdd("invoices", invData);
+    setInvoices([newInv].concat(invoices));
+    var bons = localGet("bons_cadeaux");
+    bons.push({
+      id: Date.now().toString(),
+      beneficiaire: beneficiaire,
+      soin: soinChoisi,
+      dateDebut: dateDebut,
+      dateFin: dateFin.toISOString().slice(0, 10),
+      duree: dureeValidite,
+      acheteur: (acheteur.name || "") + " " + (acheteur.firstname || ""),
+      factureNum: invData.number
+    });
+    localSet("bons_cadeaux", bons);
+    setFactureCreee(newInv);
+  };
+  return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "page-header"
+  }, /*#__PURE__*/React.createElement("h2", null, "Bon cadeau"), /*#__PURE__*/React.createElement("p", null, "Cr\xE9er un bon cadeau et facturer l'acheteur")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "grid",
+      gridTemplateColumns: "1fr 1fr",
+      gap: 24
+    }
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    className: "card"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "card-title"
+  }, "\uD83C\uDF81 Le bon cadeau"), /*#__PURE__*/React.createElement("div", {
+    className: "form-group"
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "B\xE9n\xE9ficiaire (qui re\xE7oit le bon)"), /*#__PURE__*/React.createElement("input", {
+    className: "form-input",
+    placeholder: "Nom de la personne",
+    value: beneficiaire,
+    onChange: function (e) {
+      setBeneficiaire(e.target.value);
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "form-group"
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "Type de soin"), /*#__PURE__*/React.createElement("select", {
+    className: "form-select",
+    value: soinChoisi,
+    onChange: function (e) {
+      var val = e.target.value;
+      setSoinChoisi(val);
+      var svc = services.find(function (s) {
+        return s.name === val;
+      });
+      if (svc) setPrixBon(String(svc.price));
+    }
+  }, services.map(function (s) {
+    return /*#__PURE__*/React.createElement("option", {
+      key: s.id,
+      value: s.name
+    }, s.name, " \u2014 ", s.price, " \u20AC");
+  }))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 12
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "form-group",
+    style: {
+      flex: 1
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "Date de validit\xE9"), /*#__PURE__*/React.createElement("input", {
+    className: "form-input",
+    type: "date",
+    value: dateDebut,
+    onChange: function (e) {
+      setDateDebut(e.target.value);
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "form-group",
+    style: {
+      flex: 1
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "Dur\xE9e"), /*#__PURE__*/React.createElement("select", {
+    className: "form-select",
+    value: dureeValidite,
+    onChange: function (e) {
+      setDureeValidite(parseInt(e.target.value));
+    }
+  }, /*#__PURE__*/React.createElement("option", {
+    value: 3
+  }, "3 mois"), /*#__PURE__*/React.createElement("option", {
+    value: 4
+  }, "4 mois"), /*#__PURE__*/React.createElement("option", {
+    value: 5
+  }, "5 mois"), /*#__PURE__*/React.createElement("option", {
+    value: 6
+  }, "6 mois"), /*#__PURE__*/React.createElement("option", {
+    value: 9
+  }, "9 mois"), /*#__PURE__*/React.createElement("option", {
+    value: 12
+  }, "12 mois"))), /*#__PURE__*/React.createElement("div", {
+    className: "form-group",
+    style: {
+      flex: 1
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "Prix du bon (\u20AC)"), /*#__PURE__*/React.createElement("input", {
+    className: "form-input",
+    type: "number",
+    value: prixBon,
+    onChange: function (e) {
+      setPrixBon(e.target.value);
+    }
+  }))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: "var(--text-lt)",
+      marginBottom: 16,
+      fontWeight: 500
+    }
+  }, "Valable jusqu'au : ", /*#__PURE__*/React.createElement("strong", {
+    style: {
+      color: "var(--lav-dk)"
+    }
+  }, dateFinStr)), /*#__PURE__*/React.createElement("div", {
+    className: "form-group"
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "Message (optionnel)"), /*#__PURE__*/React.createElement("textarea", {
+    className: "form-textarea",
+    placeholder: "Un petit mot personnalis\xE9\u2026",
+    value: message,
+    onChange: function (e) {
+      setMessage(e.target.value);
+    }
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "card"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "card-title"
+  }, "\uD83D\uDCB3 Facturer l'acheteur"), /*#__PURE__*/React.createElement("div", {
+    className: "form-group"
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "Qui ach\xE8te le bon ? *"), /*#__PURE__*/React.createElement("select", {
+    className: "form-select",
+    value: selAcheteur,
+    onChange: function (e) {
+      setSelAcheteur(e.target.value);
+    }
+  }, /*#__PURE__*/React.createElement("option", {
+    value: ""
+  }, "\u2014 Choisir un(e) client(e) \u2014"), clients.map(function (c) {
+    return /*#__PURE__*/React.createElement("option", {
+      key: c.id,
+      value: c.id
+    }, c.name, c.firstname ? " " + c.firstname : "");
+  }), /*#__PURE__*/React.createElement("option", {
+    value: "__new__"
+  }, "+ Nouveau client"))), selAcheteur === "__new__" && /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      gap: 12,
+      flexWrap: "wrap"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "form-group",
+    style: {
+      flex: 1
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "Nom *"), /*#__PURE__*/React.createElement("input", {
+    className: "form-input",
+    value: newAcheteurName,
+    onChange: function (e) {
+      setNewAcheteurName(e.target.value);
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "form-group",
+    style: {
+      flex: 1
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "Pr\xE9nom"), /*#__PURE__*/React.createElement("input", {
+    className: "form-input",
+    value: newAcheteurFirstname,
+    onChange: function (e) {
+      setNewAcheteurFirstname(e.target.value);
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "form-group",
+    style: {
+      flex: 1
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "T\xE9l\xE9phone"), /*#__PURE__*/React.createElement("input", {
+    className: "form-input",
+    value: newAcheteurPhone,
+    onChange: function (e) {
+      setNewAcheteurPhone(e.target.value);
+    }
+  }))), /*#__PURE__*/React.createElement("div", {
+    className: "form-group"
+  }, /*#__PURE__*/React.createElement("label", {
+    className: "form-label"
+  }, "Mode de paiement"), /*#__PURE__*/React.createElement("select", {
+    className: "form-select",
+    value: payMethod,
+    onChange: function (e) {
+      setPayMethod(e.target.value);
+    }
+  }, /*#__PURE__*/React.createElement("option", null, "Esp\xE8ces"), /*#__PURE__*/React.createElement("option", null, "Ch\xE8que"), /*#__PURE__*/React.createElement("option", null, "Carte bancaire"), /*#__PURE__*/React.createElement("option", null, "Virement"))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      flexDirection: "column",
+      gap: 10,
+      marginTop: 16
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-primary",
+    onClick: function () {
+      var body = "Bonjour " + (beneficiaire || "") + ",\n\n" + "✿ ═══════════════════════════════ ✿\n\n" + "          BON CADEAU\n\n" + "     pour " + soinChoisi + "\n\n" + "✿ ═══════════════════════════════ ✿\n\n" + (beneficiaire ? "Offert a : " + beneficiaire + "\n\n" : "") + "Valable " + dureeValidite + " mois\n" + "A partir du : " + dateDebutStr + "\n" + "Date limite : " + dateFinStr + "\n\n" + (message ? "Message : " + message + "\n\n" : "") + "───────────────────────────────────\n" + "Pour prendre rendez-vous :\n\n" + CAB.name + "\n" + "Georgiana Villemot\n" + CAB.address + "\n" + CAB.city + "\n" + "Tel : " + CAB.phone + "\n" + "Mail : " + CAB.email + "\n" + "───────────────────────────────────\n\n" + "A bientot !\nGeorgiana";
+      window.open("mailto:?subject=" + encodeURIComponent("Votre bon cadeau - " + CAB.name) + "&body=" + encodeURIComponent(body));
+    },
+    style: {
+      width: "100%",
+      justifyContent: "center"
+    }
+  }, "\uD83D\uDCE7 Envoyer le bon par mail"), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-secondary",
+    onClick: doPrintBon,
+    style: {
+      width: "100%",
+      justifyContent: "center"
+    }
+  }, "\uD83D\uDDA8\uFE0F Imprimer le bon"), /*#__PURE__*/React.createElement("button", {
+    className: "btn btn-secondary",
+    onClick: handleFacturer,
+    style: {
+      width: "100%",
+      justifyContent: "center"
+    },
+    disabled: !selAcheteur
+  }, "\uD83D\uDCB3 Cr\xE9er la facture")), factureCreee && /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 16,
+      padding: 12,
+      background: "var(--ok-bg)",
+      borderRadius: 10,
+      fontSize: 13,
+      color: "var(--ok)",
+      fontWeight: 600
+    }
+  }, "\u2713 Facture ", factureCreee.number, " cr\xE9\xE9e \u2014 ", fmtEuro(factureCreee.total)))), /*#__PURE__*/React.createElement("div", {
+    className: "card",
+    style: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      background: "var(--lav-bg)"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      textAlign: "center",
+      padding: 40,
+      background: "#fff",
+      borderRadius: 16,
+      border: "2px solid var(--border)",
+      width: "100%",
+      maxWidth: 400,
+      position: "relative",
+      overflow: "hidden"
+    }
+  }, /*#__PURE__*/React.createElement(SwirlCorner, {
+    style: {
+      top: -5,
+      left: -5
+    }
+  }), /*#__PURE__*/React.createElement(SwirlCorner, {
+    style: {
+      top: -5,
+      right: -5
+    },
+    flip: true
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: "'Cormorant Garamond',serif",
+      fontSize: 28,
+      fontWeight: 700,
+      color: "var(--lav-dk)"
+    }
+  }, "Bon cadeau"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: "'Cormorant Garamond',serif",
+      fontSize: 14,
+      fontWeight: 500,
+      color: "var(--lav)",
+      fontStyle: "italic",
+      marginBottom: 16
+    }
+  }, "pour ", soinChoisi), beneficiaire && /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 13,
+      fontWeight: 600,
+      marginBottom: 12
+    }
+  }, "Offert \xE0 : ", beneficiaire), /*#__PURE__*/React.createElement(Lotus, {
+    size: 48,
+    color: "#D4A0C0"
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: "var(--text-mid)",
+      marginTop: 16
+    }
+  }, "Valable ", dureeValidite, " mois \xE0 partir du"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 14,
+      fontWeight: 700,
+      color: "var(--lav-dk)"
+    }
+  }, dateDebutStr), message && /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      color: "var(--text-lt)",
+      fontStyle: "italic",
+      marginTop: 12,
+      padding: "8px 12px",
+      background: "var(--lav-bg)",
+      borderRadius: 8
+    }
+  }, message), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 20,
+      paddingTop: 12,
+      borderTop: "1px solid var(--border-light)",
+      fontSize: 10,
+      color: "var(--text-lt)"
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: "'Cormorant Garamond',serif",
+      fontSize: 13,
+      fontWeight: 600,
+      fontStyle: "italic",
+      color: "var(--lav)"
+    }
+  }, "R\xE9flexologie et Th\xE9rapie Manuelle"), "VILLEMOT Georgiana \u2014 ", CAB.phone), /*#__PURE__*/React.createElement(SwirlCorner, {
+    style: {
+      bottom: -5,
+      left: -5,
+      transform: "scaleY(-1)"
+    }
+  }), /*#__PURE__*/React.createElement(SwirlCorner, {
+    style: {
+      bottom: -5,
+      right: -5,
+      transform: "scale(-1,-1)"
+    }
+  })))));
+}
+function App() {
+  const [authed, setAuthed] = useState(null);
+  const [pin, setPin] = useState("");
+  const [loginError, setLoginError] = useState("");
+  const [loginLoading, setLoginLoading] = useState(false);
+  const [tab, setTab] = useState("invoices");
+  const [clients, setClients] = useState([]);
+  const [invoices, setInvoices] = useState([]);
+  const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [splash, setSplash] = useState(true);
+  const [splashFade, setSplashFade] = useState(false);
+  const [showAlerts, setShowAlerts] = useState(false);
+
+  // Check auth state on load
+  useEffect(function () {
+    var unsub = auth.onAuthStateChanged(function(user) {
+      if (user) { setAuthed(true); }
+      else { setAuthed(false); setLoading(false); }
+    });
+    return unsub;
+  }, []);
+
+  var handleLogin = function() {
+    if (!pin.trim() || pin.length < 6) { setLoginError("Le code doit contenir au moins 6 caractères"); return; }
+    setLoginLoading(true);
+    setLoginError("");
+    auth.signInWithEmailAndPassword(AUTH_EMAIL, pin).then(function() {
+      setLoginLoading(false);
+    }).catch(function(err) {
+      setLoginLoading(false);
+      if (err.code === "auth/wrong-password" || err.code === "auth/invalid-credential") { setLoginError("Code incorrect"); }
+      else if (err.code === "auth/user-not-found") { setLoginError("Compte non configure"); }
+      else { setLoginError("Erreur de connexion"); }
+    });
+  };
+
+  // Load data only when authed
+  useEffect(function () {
+    if (authed !== true) return;
+    Promise.all([fbGetAll("clients"), fbGetAll("invoices"), localLoad("services", DEFAULT_SERVICES), localLoad("bons_cadeaux", [])]).then(function (res) {
+      setClients(res[0]);
+      var inv = res[1];
+      inv.sort(function (a, b) {
+        return (b.date || "").localeCompare(a.date || "");
+      });
+      setInvoices(inv);
+      var svc = res[2];
+      if (svc.length > 0) { setServices(svc); } else { setServices(DEFAULT_SERVICES); localSet("services", DEFAULT_SERVICES); }
+      setLoading(false);
+    }).catch(function (err) {
+      console.error(err);
+      setError("Impossible de se connecter à la base de données.");
+      setLoading(false);
+    });
+  }, [authed]);
+  useEffect(function () {
+    if (!loading && !error) {
+      var t1 = setTimeout(function () {
+        setSplashFade(true);
+      }, 4200);
+      var t2 = setTimeout(function () {
+        setSplash(false);
+        setShowAlerts(true);
+      }, 5000);
+      return function () {
+        clearTimeout(t1);
+        clearTimeout(t2);
+      };
+    }
+  }, [loading, error]);
+  useEffect(function () {
+    if (showAlerts) {
+      var now = new Date();
+      var bdayCount = clients.filter(function (c) {
+        if (!c.birthday) return false;
+        return new Date(c.birthday).getMonth() === now.getMonth();
+      }).length;
+      var bons = localGet("bons_cadeaux");
+      var todayStr = now.toISOString().slice(0, 10);
+      var dans30j = new Date(now);
+      dans30j.setDate(dans30j.getDate() + 30);
+      var bonsCount = bons.filter(function (b) {
+        return b.dateFin >= todayStr && b.dateFin <= dans30j.toISOString().slice(0, 10);
+      }).length;
+      if (bdayCount > 0 || bonsCount > 0) {
+        playChime();
+      } else {
+        setShowAlerts(false);
+      }
+    }
+  }, [showAlerts]);
+
+  // Login screen
+  if (authed === false) return React.createElement("div", {className: "login-screen"},
+    React.createElement("div", {className: "login-box"},
+      React.createElement(Lotus, {size: 48, color: "#8B7CB8"}),
+      React.createElement("div", {className: "login-title"}, "R\xE9flexologie et Th\xE9rapie Manuelle"),
+      React.createElement("div", {className: "login-sub"}, "Entrez votre code pour acc\xE9der \xE0 l\u2019application"),
+      React.createElement("input", {
+        className: "login-input",
+        type: "password",
+        placeholder: "\u2022\u2022\u2022\u2022\u2022\u2022",
+        value: pin,
+        onChange: function(e) { setPin(e.target.value); setLoginError(""); },
+        onKeyDown: function(e) { if (e.key === "Enter") handleLogin(); }
+      }),
+      React.createElement("button", {
+        className: "login-btn",
+        onClick: handleLogin,
+        disabled: loginLoading
+      }, loginLoading ? "Connexion..." : "\u2728 Entrer"),
+      loginError && React.createElement("div", {className: "login-error"}, loginError)
+    )
+  );
+
+  if (authed === null) return React.createElement("div", {className: "splash"},
+    React.createElement("div", {className: "splash-lotus"}, React.createElement(Lotus, {size: 64, color: "#C4B0E0"})),
+    React.createElement("div", {className: "splash-title"}, "R\xE9flexologie et", React.createElement("br", null), "Th\xE9rapie Manuelle"),
+    React.createElement("div", {className: "splash-sub"}, "Georgiana Villemot"),
+    React.createElement("div", {className: "splash-line"}),
+    React.createElement("div", {className: "splash-dots"},
+      React.createElement("div", {className: "splash-dot"}),
+      React.createElement("div", {className: "splash-dot"}),
+      React.createElement("div", {className: "splash-dot"})
+    )
+  );
+
+  if (loading) return /*#__PURE__*/React.createElement("div", {
+    className: "splash"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "splash-lotus"
+  }, /*#__PURE__*/React.createElement(Lotus, {
+    size: 64,
+    color: "#C4B0E0"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "splash-title"
+  }, "R\xE9flexologie et", /*#__PURE__*/React.createElement("br", null), "Th\xE9rapie Manuelle"), /*#__PURE__*/React.createElement("div", {
+    className: "splash-sub"
+  }, "Georgiana Villemot"), /*#__PURE__*/React.createElement("div", {
+    className: "splash-line"
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "splash-dots"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "splash-dot"
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "splash-dot"
+  }), /*#__PURE__*/React.createElement("div", {
+    className: "splash-dot"
+  })));
+  if (error) return /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      height: "100vh",
+      gap: 12
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 40,
+      opacity: .4
+    }
+  }, "\u26A0\uFE0F"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontFamily: "'Cormorant Garamond',serif",
+      fontSize: 18,
+      color: "#C07B7B",
+      textAlign: "center",
+      maxWidth: 400,
+      fontStyle: "italic"
+    }
+  }, error));
+  return /*#__PURE__*/React.createElement("div", null, splash && /*#__PURE__*/React.createElement("div", {
+    className: "splash" + (splashFade ? " fade-out" : "")
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "splash-lotus"
+  }, /*#__PURE__*/React.createElement(Lotus, {
+    size: 64,
+    color: "#C4B0E0"
+  })), /*#__PURE__*/React.createElement("div", {
+    className: "splash-title"
+  }, "R\xE9flexologie et", /*#__PURE__*/React.createElement("br", null), "Th\xE9rapie Manuelle"), /*#__PURE__*/React.createElement("div", {
+    className: "splash-sub"
+  }, "Georgiana Villemot"), /*#__PURE__*/React.createElement("div", {
+    className: "splash-line"
+  })), showAlerts && function () {
+    var now = new Date();
+    var currentMonth = now.getMonth();
+    var monthNames = ["Janvier", "Fevrier", "Mars", "Avril", "Mai", "Juin", "Juillet", "Aout", "Septembre", "Octobre", "Novembre", "Decembre"];
+    var bdayClients = clients.filter(function (c) {
+      if (!c.birthday) return false;
+      return new Date(c.birthday).getMonth() === currentMonth;
+    });
+    var bons = localGet("bons_cadeaux");
+    var todayStr = now.toISOString().slice(0, 10);
+    var dans30j = new Date(now);
+    dans30j.setDate(dans30j.getDate() + 30);
+    var dans30jStr = dans30j.toISOString().slice(0, 10);
+    var bonsExp = bons.filter(function (b) {
+      return b.dateFin >= todayStr && b.dateFin <= dans30jStr;
+    });
+    if (bdayClients.length === 0 && bonsExp.length === 0) return null;
+    return /*#__PURE__*/React.createElement("div", {
+      className: "alert-popup"
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "alert-popup-inner"
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        textAlign: "center",
+        marginBottom: 16
+      }
+    }, /*#__PURE__*/React.createElement(Lotus, {
+      size: 40,
+      color: "#8B7CB8"
+    })), /*#__PURE__*/React.createElement("div", {
+      className: "alert-popup-title"
+    }, "Bonjour Gina !"), /*#__PURE__*/React.createElement("div", {
+      className: "alert-popup-sub"
+    }, "Vous avez des notifications"), bdayClients.length > 0 && /*#__PURE__*/React.createElement("div", {
+      className: "alert-section",
+      style: {
+        background: "linear-gradient(135deg,#FFFDF5,#FFF8E8)",
+        border: "1px solid #F5EDDA"
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "alert-section-title",
+      style: {
+        color: "var(--gold)"
+      }
+    }, "\uD83C\uDF82 Anniversaires du mois"), bdayClients.map(function (c) {
+      var jour = new Date(c.birthday).getDate();
+      return /*#__PURE__*/React.createElement("div", {
+        className: "alert-item",
+        key: c.id
+      }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", {
+        style: {
+          fontWeight: 700
+        }
+      }, c.name, c.firstname ? " " + c.firstname : ""), /*#__PURE__*/React.createElement("span", {
+        style: {
+          fontSize: 12,
+          color: "var(--text-lt)",
+          marginLeft: 8
+        }
+      }, jour, " ", monthNames[currentMonth])), c.email && /*#__PURE__*/React.createElement("button", {
+        onClick: function () {
+          window.open("mailto:" + c.email + "?subject=" + encodeURIComponent("Joyeux anniversaire") + "&body=" + encodeURIComponent("Bonjour " + (c.firstname || c.name) + ",\n\nPour votre anniversaire je vous offre un bon cadeau pour une seance !\n\nA bientot,\nGeorgiana"));
+        },
+        style: {
+          fontSize: 11,
+          fontWeight: 600,
+          color: "var(--lav)",
+          border: "none",
+          cursor: "pointer",
+          padding: "5px 12px",
+          background: "var(--lav-bg)",
+          borderRadius: 16,
+          fontFamily: "'Quicksand',sans-serif"
+        }
+      }, "\uD83D\uDCE7 Mail"));
+    })), bonsExp.length > 0 && /*#__PURE__*/React.createElement("div", {
+      className: "alert-section",
+      style: {
+        background: "linear-gradient(135deg,#FFF8F7,#FDF2F0)",
+        border: "1px solid #F0D5D5"
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      className: "alert-section-title",
+      style: {
+        color: "var(--danger)"
+      }
+    }, "\u23F0 Bons cadeaux bientot expires"), bonsExp.map(function (b) {
+      var jRestants = Math.ceil((new Date(b.dateFin) - now) / (1000 * 60 * 60 * 24));
+      return /*#__PURE__*/React.createElement("div", {
+        className: "alert-item",
+        key: b.id
+      }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("span", {
+        style: {
+          fontWeight: 700
+        }
+      }, b.beneficiaire || "Sans nom"), /*#__PURE__*/React.createElement("span", {
+        style: {
+          fontSize: 12,
+          color: "var(--text-lt)",
+          marginLeft: 8
+        }
+      }, b.soin)), /*#__PURE__*/React.createElement("span", {
+        style: {
+          fontSize: 11,
+          fontWeight: 700,
+          color: "var(--danger)"
+        }
+      }, jRestants, "j restant(s)"));
+    })), /*#__PURE__*/React.createElement("button", {
+      className: "alert-close-btn",
+      onClick: function () {
+        setShowAlerts(false);
+      }
+    }, "\u273F C'est not\xE9, merci !")));
+  }(), /*#__PURE__*/React.createElement("aside", {
+    className: "sidebar"
+  }, /*#__PURE__*/React.createElement("div", {
+    className: "sidebar-brand"
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      textAlign: "center",
+      marginBottom: 10
+    }
+  }, /*#__PURE__*/React.createElement(Lotus, {
+    size: 36,
+    color: "#C4B0E0"
+  })), /*#__PURE__*/React.createElement("h1", null, "R\xE9flexologie et Th\xE9rapie Manuelle"), /*#__PURE__*/React.createElement("p", null, "Georgiana Villemot")), /*#__PURE__*/React.createElement("nav", {
+    className: "sidebar-nav"
+  }, TABS.map(function (t) {
+    return /*#__PURE__*/React.createElement("button", {
+      key: t.id,
+      className: "tab-btn" + (tab === t.id ? " active" : ""),
+      onClick: function () {
+        setTab(t.id);
+      }
+    }, /*#__PURE__*/React.createElement("span", {
+      className: "tab-icon"
+    }, t.icon), /*#__PURE__*/React.createElement("span", {
+      className: "tab-label"
+    }, t.label));
+  }))), /*#__PURE__*/React.createElement("main", {
+    className: "main-content"
+  }, tab === "dashboard" && /*#__PURE__*/React.createElement(Dashboard, {
+    invoices: invoices,
+    clients: clients
+  }), tab === "clients" && /*#__PURE__*/React.createElement(ClientsPage, {
+    clients: clients,
+    setClients: setClients
+  }), tab === "services" && /*#__PURE__*/React.createElement(ServicesPage, {
+    services: services,
+    setServices: setServices
+  }), tab === "boncadeau" && /*#__PURE__*/React.createElement(BonCadeauPage, {
+    clients: clients,
+    setClients: setClients,
+    invoices: invoices,
+    setInvoices: setInvoices,
+    services: services
+  }), tab === "invoices" && /*#__PURE__*/React.createElement(InvoicesPage, {
+    invoices: invoices,
+    setInvoices: setInvoices,
+    clients: clients,
+    setClients: setClients,
+    services: services
+  })));
+}
+ReactDOM.createRoot(document.getElementById("root")).render(/*#__PURE__*/React.createElement(App, null));
+</script>
+</body>
+</html>
