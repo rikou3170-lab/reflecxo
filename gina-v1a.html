@@ -148,6 +148,7 @@ tr:hover td{background:var(--lav-bg)}
   .login-box{margin:16px;padding:32px 24px}
   .login-input{font-size:18px}
   .svc-card{padding:16px 14px}
+  .boncadeau-grid{grid-template-columns:1fr!important}
 }
 @media(max-width:380px){
   .stats-grid{grid-template-columns:1fr}
@@ -2419,6 +2420,7 @@ function BonCadeauPage({
   return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     className: "page-header"
   }, /*#__PURE__*/React.createElement("h2", null, "Bon cadeau"), /*#__PURE__*/React.createElement("p", null, "Cr\xE9er un bon cadeau et facturer l'acheteur")), /*#__PURE__*/React.createElement("div", {
+    className: "boncadeau-grid",
     style: {
       display: "grid",
       gridTemplateColumns: "1fr 1fr",
