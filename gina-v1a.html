@@ -1395,7 +1395,7 @@ function ClientsPage({
   }, "Annuler"), /*#__PURE__*/React.createElement("button", {
     className: "btn btn-primary",
     onClick: handleSave
-  }, "Enregistrer"))))), historyClient && /*#__PURE__*/React.createElement("div", {
+  }, "Enregistrer")))), historyClient && /*#__PURE__*/React.createElement("div", {
     className: "modal-overlay",
     onClick: function() { setHistoryClient(null); }
   }, /*#__PURE__*/React.createElement("div", {
@@ -1431,7 +1431,7 @@ function ClientsPage({
         /*#__PURE__*/React.createElement("td", {style:{textAlign:"right", fontWeight:700}}, fmtEuro(inv.total))
       );
     })))));
-  })())));
+  })()))));
 }
 function ServicesPage({
   services,
