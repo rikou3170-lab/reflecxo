@@ -221,7 +221,7 @@ link.href = URL.createObjectURL(blob);
 document.head.appendChild(link);
 
 // ─── Versioning + Force reload ───
-var APP_VERSION = "1.0." + Date.now();
+var APP_VERSION = "v1.5 - PDF facture";
 console.log("Gina app version:", APP_VERSION);
 
 // ─── Service Worker ───
@@ -2319,49 +2319,52 @@ function InvoicesPage({
       var clientAddr = preview.client.address ? preview.client.address + "<br>" : "";
       var paidLine = preview.paid ? "<div style='margin-top:8px;font-size:13px;color:#7BA07E;font-weight:600;text-align:right'>&check; Payee</div>" : "<div style='margin-top:8px;font-size:13px;color:#C4A24E;font-weight:600;text-align:right'>En attente</div>";
 
-      var html = "<!DOCTYPE html><html><head><meta charset='utf-8'><style>" +
+      var styles = "<style>" +
         "*{margin:0;padding:0;box-sizing:border-box}" +
-        "body{font-family:Georgia,serif;color:#3E3650;background:#fff}" +
-        ".page{width:210mm;min-height:297mm;padding:25mm 22mm;display:flex;flex-direction:column}" +
-        ".header{text-align:center;margin-bottom:30px;padding-bottom:18px;border-bottom:2px solid #8B7CB8}" +
-        ".title{font-size:38px;font-weight:700;color:#6B5A9E;letter-spacing:.04em;font-style:italic}" +
-        ".num{font-size:13px;color:#9D93AE;margin-top:8px;letter-spacing:.06em;text-transform:uppercase}" +
-        ".parties{display:flex;justify-content:space-between;margin-bottom:30px;gap:30px}" +
-        ".party{flex:1}" +
-        ".pl{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8B7CB8;font-weight:700;margin-bottom:12px}" +
-        ".pn{font-weight:700;font-size:16px;margin-bottom:4px}" +
-        ".ptitle{font-size:13px;color:#6B5A9E;font-style:italic;margin-bottom:8px}" +
-        ".pinfo{font-size:13px;color:#444;line-height:1.7}" +
-        ".plegal{font-size:11px;color:#9D93AE;line-height:1.6;margin-top:14px;font-style:italic}" +
-        ".date-row{display:flex;justify-content:space-between;margin-bottom:24px;padding:14px 0;border-top:1px solid #f0eaf5;border-bottom:1px solid #f0eaf5;font-size:13px}" +
-        ".date-row strong{color:#6B5A9E}" +
-        "table{width:100%;border-collapse:collapse;margin-bottom:24px}" +
-        "th{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#9D93AE;text-align:left;padding:14px 10px;border-bottom:2px solid #8B7CB8;font-weight:700}" +
-        "th:last-child{text-align:right}" +
-        "td{padding:18px 10px;border-bottom:1px solid #f0eaf5;font-size:13px}" +
-        "td:last-child{text-align:right;font-weight:600}" +
-        ".total-row{display:flex;justify-content:flex-end;align-items:center;margin-top:20px;padding:24px 0;border-top:2px solid #8B7CB8}" +
-        ".tlabel{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#9D93AE;margin-right:30px;font-weight:700}" +
-        ".tvalue{font-family:Georgia,serif;font-size:38px;font-weight:700;color:#6B5A9E}" +
-        ".spacer{flex:1}" +
-        ".footer{padding-top:18px;border-top:1px solid #f0eaf5;font-size:10px;color:#9D93AE;text-align:center;line-height:1.7;font-style:italic}" +
-        "</style></head><body>" +
-        "<div class='page'>" +
+        ".pdfwrap{font-family:Georgia,serif;color:#3E3650;background:#fff;width:794px;padding:60px 50px}" +
+        ".pdfwrap .header{text-align:center;margin-bottom:30px;padding-bottom:18px;border-bottom:2px solid #8B7CB8}" +
+        ".pdfwrap .title{font-size:38px;font-weight:700;color:#6B5A9E;letter-spacing:2px;font-style:italic}" +
+        ".pdfwrap .num{font-size:13px;color:#9D93AE;margin-top:8px;letter-spacing:1px;text-transform:uppercase}" +
+        ".pdfwrap .parties{display:table;width:100%;margin-bottom:30px}" +
+        ".pdfwrap .party-left,.pdfwrap .party-right{display:table-cell;vertical-align:top;width:50%}" +
+        ".pdfwrap .party-right{text-align:right}" +
+        ".pdfwrap .pl{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#8B7CB8;font-weight:700;margin-bottom:12px}" +
+        ".pdfwrap .pn{font-weight:700;font-size:16px;margin-bottom:4px}" +
+        ".pdfwrap .ptitle{font-size:13px;color:#6B5A9E;font-style:italic;margin-bottom:8px}" +
+        ".pdfwrap .pinfo{font-size:13px;color:#444;line-height:1.7}" +
+        ".pdfwrap .plegal{font-size:11px;color:#9D93AE;line-height:1.6;margin-top:14px;font-style:italic}" +
+        ".pdfwrap .date-row{display:table;width:100%;margin-bottom:24px;padding:14px 0;border-top:1px solid #f0eaf5;border-bottom:1px solid #f0eaf5;font-size:13px}" +
+        ".pdfwrap .date-row > div{display:table-cell;width:50%}" +
+        ".pdfwrap .date-row > div:last-child{text-align:right}" +
+        ".pdfwrap .date-row strong{color:#6B5A9E}" +
+        ".pdfwrap table{width:100%;border-collapse:collapse;margin-bottom:24px}" +
+        ".pdfwrap th{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#9D93AE;text-align:left;padding:14px 10px;border-bottom:2px solid #8B7CB8;font-weight:700}" +
+        ".pdfwrap th:last-child{text-align:right}" +
+        ".pdfwrap td{padding:18px 10px;border-bottom:1px solid #f0eaf5;font-size:13px}" +
+        ".pdfwrap td:last-child{text-align:right;font-weight:600}" +
+        ".pdfwrap .total-row{text-align:right;margin-top:20px;padding:24px 0;border-top:2px solid #8B7CB8}" +
+        ".pdfwrap .tlabel{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#9D93AE;margin-right:30px;font-weight:700}" +
+        ".pdfwrap .tvalue{font-family:Georgia,serif;font-size:38px;font-weight:700;color:#6B5A9E;display:inline-block;vertical-align:middle}" +
+        ".pdfwrap .paid{margin-top:8px;font-size:13px;color:#7BA07E;font-weight:600;text-align:right}" +
+        ".pdfwrap .pending{margin-top:8px;font-size:13px;color:#C4A24E;font-weight:600;text-align:right}" +
+        ".pdfwrap .footer{margin-top:60px;padding-top:18px;border-top:1px solid #f0eaf5;font-size:10px;color:#9D93AE;text-align:center;line-height:1.7;font-style:italic}" +
+        "</style>";
+
+      var bodyHtml = "<div class='pdfwrap'>" +
         "<div class='header'><div class='title'>Facture</div><div class='num'>N&deg; " + preview.number + "</div></div>" +
         "<div class='parties'>" +
-        "<div class='party'><div class='pl'>Facture par</div><div class='pn'>" + CAB.owner + "</div><div class='ptitle'>" + CAB.title + "</div>" +
+        "<div class='party-left'><div class='pl'>Facture par</div><div class='pn'>" + CAB.owner + "</div><div class='ptitle'>" + CAB.title + "</div>" +
         "<div class='pinfo'>" + CAB.address + "<br>" + CAB.city + "<br>Tel : " + CAB.phone + "<br>Mail : " + CAB.email + "</div>" +
         "<div class='plegal'>SIRET : " + CAB.siret + "<br>Code APE : " + CAB.ape + "<br>" + CAB.legal + "</div></div>" +
-        "<div class='party' style='text-align:right'><div class='pl'>Facture a</div><div class='pn'>" + clientStr + "</div>" +
+        "<div class='party-right'><div class='pl'>Facture a</div><div class='pn'>" + clientStr + "</div>" +
         "<div class='pinfo'>" + clientPhone + clientAddr + "</div></div>" +
         "</div>" +
         "<div class='date-row'><div><strong>Date :</strong> " + fmtDate(preview.date) + "</div><div><strong>Mode de paiement :</strong> " + (preview.payMethod || "—") + "</div></div>" +
         "<table><thead><tr><th>Prestation</th><th>Duree</th><th>Qte</th><th>Prix</th></tr></thead><tbody>" + lignesHtml + "</tbody></table>" +
-        "<div class='total-row'><div class='tlabel'>Total a payer</div><div class='tvalue'>" + preview.total.toFixed(2).replace(".",",") + " &euro;</div></div>" +
-        paidLine +
-        "<div class='spacer'></div>" +
+        "<div class='total-row'><span class='tlabel'>Total a payer</span><span class='tvalue'>" + preview.total.toFixed(2).replace(".",",") + " &euro;</span></div>" +
+        (preview.paid ? "<div class='paid'>&check; Payee</div>" : "<div class='pending'>En attente</div>") +
         "<div class='footer'>" + CAB.owner + " &mdash; SIRET : " + CAB.siret + " &mdash; Code APE : " + CAB.ape + "<br>" + CAB.address + ", " + CAB.city + " &mdash; Tel : " + CAB.phone + "<br>TVA non applicable, article 293 B du CGI</div>" +
-        "</div></body></html>";
+        "</div>";
 
       // Generation du PDF puis envoi
       var btn = window.event.target;
@@ -2369,16 +2372,20 @@ function InvoicesPage({
       btn.textContent = "Envoi en cours...";
       btn.disabled = true;
 
+      // Injecte les styles dans le head
+      var styleEl = document.createElement("div");
+      styleEl.innerHTML = styles;
+      document.head.appendChild(styleEl.firstElementChild);
+
+      // Cree le wrapper visible mais hors champ
       var container = document.createElement("div");
-      container.innerHTML = html;
-      container.style.position = "fixed";
+      container.innerHTML = bodyHtml;
+      container.style.position = "absolute";
       container.style.top = "0";
       container.style.left = "0";
-      container.style.width = "210mm";
-      container.style.zIndex = "-9999";
-      container.style.opacity = "0";
-      container.style.pointerEvents = "none";
+      container.style.zIndex = "-99999";
       document.body.appendChild(container);
+      var target = container.firstElementChild;
 
       var opt = {
         margin: 0,
@@ -2390,7 +2397,7 @@ function InvoicesPage({
 
       // Petit delai pour laisser le DOM se rendre avant la capture
       setTimeout(function(){
-        window.html2pdf().set(opt).from(container.firstElementChild).outputPdf("datauristring").then(function(dataUri){
+        window.html2pdf().set(opt).from(target).outputPdf("datauristring").then(function(dataUri){
         document.body.removeChild(container);
         var base64 = dataUri.split(",")[1];
         return fetch(MAIL_WEBAPP_URL, {
@@ -3707,7 +3714,7 @@ function App() {
   }, /*#__PURE__*/React.createElement(Lotus, {
     size: 36,
     color: "#C4B0E0"
-  })), /*#__PURE__*/React.createElement("h1", null, "R\xE9flexologie et Th\xE9rapie Manuelle"), /*#__PURE__*/React.createElement("p", null, "Georgiana Villemot")), /*#__PURE__*/React.createElement("nav", {
+  })), /*#__PURE__*/React.createElement("h1", null, "R\xE9flexologie et Th\xE9rapie Manuelle"), /*#__PURE__*/React.createElement("p", null, "Georgiana Villemot"), /*#__PURE__*/React.createElement("div", {style:{fontSize:9, color:"rgba(255,255,255,.3)", marginTop:6, fontFamily:"monospace", letterSpacing:0}}, APP_VERSION)), /*#__PURE__*/React.createElement("nav", {
     className: "sidebar-nav"
   }, TABS.map(function (t) {
     return /*#__PURE__*/React.createElement("button", {
