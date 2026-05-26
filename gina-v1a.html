@@ -2372,18 +2372,25 @@ function InvoicesPage({
       var container = document.createElement("div");
       container.innerHTML = html;
       container.style.position = "fixed";
-      container.style.left = "-10000px";
+      container.style.top = "0";
+      container.style.left = "0";
+      container.style.width = "210mm";
+      container.style.zIndex = "-9999";
+      container.style.opacity = "0";
+      container.style.pointerEvents = "none";
       document.body.appendChild(container);
 
       var opt = {
         margin: 0,
         filename: "facture-" + preview.number + ".pdf",
         image: { type: "jpeg", quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
+        html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: "#ffffff" },
         jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
       };
 
-      window.html2pdf().set(opt).from(container.firstElementChild).outputPdf("datauristring").then(function(dataUri){
+      // Petit delai pour laisser le DOM se rendre avant la capture
+      setTimeout(function(){
+        window.html2pdf().set(opt).from(container.firstElementChild).outputPdf("datauristring").then(function(dataUri){
         document.body.removeChild(container);
         var base64 = dataUri.split(",")[1];
         return fetch(MAIL_WEBAPP_URL, {
@@ -2409,6 +2416,7 @@ function InvoicesPage({
         btn.disabled = false;
         alert("Erreur d'envoi : " + err.message);
       });
+      }, 200);
     }
   }, "\uD83D\uDCE7 Envoyer par mail"), /*#__PURE__*/React.createElement("button", {
     className: "btn btn-primary",
