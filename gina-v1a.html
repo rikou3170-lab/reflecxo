@@ -221,7 +221,7 @@ link.href = URL.createObjectURL(blob);
 document.head.appendChild(link);
 
 // ─── Versioning + Force reload ───
-var APP_VERSION = "v1.5 - PDF facture";
+var APP_VERSION = "v1.6 - PDF bon cadeau";
 console.log("Gina app version:", APP_VERSION);
 
 // ─── Service Worker ───
@@ -2958,8 +2958,112 @@ function BonCadeauPage({
   }, /*#__PURE__*/React.createElement("button", {
     className: "btn btn-primary",
     onClick: function () {
-      var body = "Bonjour " + (beneficiaire || "") + ",\n\nBonne nouvelle ! On vous a offert un bon cadeau.\n\n---\nBON CADEAU\npour " + soinChoisi + "\n---\n\n" + (beneficiaire ? "Offert a : " + beneficiaire + "\n\n" : "") + "Valable " + dureeValidite + " mois\nA partir du : " + dateDebutStr + "\nDate limite : " + dateFinStr + "\n\n" + (message ? "Message : " + message + "\n\n" : "") + "Pour prendre rendez-vous :\n\n" + CAB.name + "\nGeorgiana Villemot\n" + CAB.address + "\n" + CAB.city + "\nTel : " + CAB.phone + "\nMail : " + CAB.email + "\n\nA bientot !\nGeorgiana";
-      window.open("mailto:?subject=" + encodeURIComponent("Votre bon cadeau - " + CAB.name) + "&body=" + encodeURIComponent(body));
+      if (MAIL_WEBAPP_URL === "VOTRE_WEBAPP_URL") {
+        alert("Configuration manquante : l'URL du Web App n'est pas renseignee.");
+        return;
+      }
+      var to = prompt("Email du destinataire du bon cadeau :");
+      if (!to || !to.trim()) return;
+      to = to.trim();
+
+      // Construire le HTML du bon cadeau pour PDF
+      var styles = "<style>" +
+        "*{margin:0;padding:0;box-sizing:border-box}" +
+        ".boncpdf{font-family:Georgia,serif;color:#3E3650;background:#fff;width:794px;padding:60px 70px;text-align:center;position:relative}" +
+        ".boncpdf .bon-title{font-size:48px;font-weight:700;color:#6B5A9E;margin-bottom:10px;font-style:italic;letter-spacing:2px}" +
+        ".boncpdf .bon-sub{font-size:22px;color:#8B7CB8;font-style:italic;margin-bottom:36px}" +
+        ".boncpdf .bon-benef{font-size:18px;font-weight:600;color:#3E3650;margin-bottom:34px}" +
+        ".boncpdf .lotus{margin:30px 0}" +
+        ".boncpdf .bon-validite{font-size:16px;color:#6B617E;margin:30px 0 10px}" +
+        ".boncpdf .bon-dates{font-size:14px;color:#9D93AE;margin-bottom:34px}" +
+        ".boncpdf .msg-label{font-size:12px;color:#9D93AE;text-align:left;margin-bottom:8px;font-weight:600;letter-spacing:1px;text-transform:uppercase}" +
+        ".boncpdf .msg-box{font-size:14px;color:#3E3650;font-style:italic;text-align:left;min-height:60px;padding:14px 18px;border:1px solid #E8E0F0;border-radius:10px;margin-bottom:40px}" +
+        ".boncpdf .bon-footer{border-top:1px solid #E8E0F0;padding-top:24px;font-size:12px;color:#6B617E;line-height:1.8}" +
+        ".boncpdf .bon-footer .logo{font-family:Georgia,serif;font-size:18px;font-weight:600;font-style:italic;color:#8B7CB8;margin-bottom:10px}" +
+        "</style>";
+
+      var lotusSVG = "<svg viewBox='0 0 200 160' width='160' height='128' xmlns='http://www.w3.org/2000/svg'>" +
+        "<ellipse cx='100' cy='110' rx='24' ry='44' fill='#D4A0C0' opacity='0.2' transform='rotate(-25 100 110)'/>" +
+        "<ellipse cx='100' cy='110' rx='24' ry='44' fill='#D4A0C0' opacity='0.2' transform='rotate(25 100 110)'/>" +
+        "<ellipse cx='100' cy='104' rx='20' ry='48' fill='#E8B0D0' opacity='0.25'/>" +
+        "<ellipse cx='76' cy='116' rx='18' ry='36' fill='#D4A0C0' opacity='0.15' transform='rotate(-40 76 116)'/>" +
+        "<ellipse cx='124' cy='116' rx='18' ry='36' fill='#D4A0C0' opacity='0.15' transform='rotate(40 124 116)'/>" +
+        "<ellipse cx='100' cy='100' rx='14' ry='36' fill='#E8B0D0' opacity='0.35'/>" +
+        "<circle cx='100' cy='84' r='8' fill='#D4A843' opacity='0.5'/>" +
+        "</svg>";
+
+      var bodyHtml = "<div class='boncpdf'>" +
+        "<div class='bon-title'>Bon cadeau</div>" +
+        "<div class='bon-sub'>pour " + soinChoisi + "</div>" +
+        (beneficiaire ? "<div class='bon-benef'>Offert a : " + beneficiaire + "</div>" : "") +
+        "<div class='lotus'>" + lotusSVG + "</div>" +
+        "<div class='bon-validite'>Valable " + dureeValidite + " mois a partir du <strong>" + dateDebutStr + "</strong></div>" +
+        "<div class='bon-dates'>Date limite : " + dateFinStr + "</div>" +
+        (message ? "<div class='msg-label'>Message</div><div class='msg-box'>" + message + "</div>" : "") +
+        "<div class='bon-footer'>" +
+        "<div class='logo'>Reflexologie et Therapie Manuelle</div>" +
+        "VILLEMOT Georgiana<br>" +
+        CAB.address + "<br>" + CAB.city + "<br>" +
+        "Tel : " + CAB.phone + "<br>" +
+        "Mail : " + CAB.email +
+        "</div></div>";
+
+      var btn = window.event.target;
+      var originalText = btn.textContent;
+      btn.textContent = "Envoi en cours...";
+      btn.disabled = true;
+
+      var styleEl = document.createElement("div");
+      styleEl.innerHTML = styles;
+      document.head.appendChild(styleEl.firstElementChild);
+
+      var container = document.createElement("div");
+      container.innerHTML = bodyHtml;
+      container.style.position = "absolute";
+      container.style.top = "0";
+      container.style.left = "0";
+      container.style.zIndex = "-99999";
+      document.body.appendChild(container);
+      var target = container.firstElementChild;
+
+      var opt = {
+        margin: 0,
+        filename: "bon-cadeau.pdf",
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: "#ffffff" },
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+      };
+
+      setTimeout(function(){
+        window.html2pdf().set(opt).from(target).outputPdf("datauristring").then(function(dataUri){
+          document.body.removeChild(container);
+          var base64 = dataUri.split(",")[1];
+          return fetch(MAIL_WEBAPP_URL, {
+            method: "POST",
+            mode: "no-cors",
+            headers: {"Content-Type": "text/plain"},
+            body: JSON.stringify({
+              token: MAIL_WEBAPP_TOKEN,
+              to: to,
+              type: "boncadeau",
+              clientName: beneficiaire || "",
+              invoiceNumber: "BC-" + Date.now(),
+              soin: soinChoisi,
+              dateFin: dateFinStr,
+              pdfBase64: base64
+            })
+          });
+        }).then(function(){
+          btn.textContent = originalText;
+          btn.disabled = false;
+          alert("Bon cadeau envoye !");
+        }).catch(function(err){
+          try { document.body.removeChild(container); } catch(e){}
+          btn.textContent = originalText;
+          btn.disabled = false;
+          alert("Erreur d'envoi : " + err.message);
+        });
+      }, 200);
     },
     style: {
       width: "100%",
