@@ -2,6 +2,9 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#3E3650">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -217,14 +220,41 @@ link.rel = "manifest";
 link.href = URL.createObjectURL(blob);
 document.head.appendChild(link);
 
+// ─── Versioning + Force reload ───
+var APP_VERSION = "1.0." + Date.now();
+console.log("Gina app version:", APP_VERSION);
+
 // ─── Service Worker ───
 if ("serviceWorker" in navigator) {
+  // Desactive le cache + force le refresh quotidien
   var swCode = "self.addEventListener('install', function(e){ self.skipWaiting(); });" +
-    "self.addEventListener('activate', function(e){ e.waitUntil(clients.claim()); });" +
-    "self.addEventListener('fetch', function(e){ e.respondWith(fetch(e.request).catch(function(){ return caches.match(e.request); })); });";
+    "self.addEventListener('activate', function(e){ e.waitUntil(caches.keys().then(function(names){ return Promise.all(names.map(function(n){ return caches.delete(n); })); }).then(function(){ return clients.claim(); })); });" +
+    "self.addEventListener('fetch', function(e){ e.respondWith(fetch(e.request, {cache: 'no-store'}).catch(function(){ return caches.match(e.request); })); });";
   var swBlob = new Blob([swCode], {type: "application/javascript"});
-  navigator.serviceWorker.register(URL.createObjectURL(swBlob)).catch(function(){});
+  navigator.serviceWorker.register(URL.createObjectURL(swBlob)).then(function(reg){
+    // Verifie les mises a jour toutes les heures
+    setInterval(function(){ reg.update().catch(function(){}); }, 3600000);
+    // Verifie aussi au demarrage
+    reg.update().catch(function(){});
+  }).catch(function(){});
+
+  // Recharge automatiquement si une nouvelle version du SW prend le controle
+  var refreshing = false;
+  navigator.serviceWorker.addEventListener("controllerchange", function(){
+    if (refreshing) return;
+    refreshing = true;
+    window.location.reload();
+  });
 }
+
+// Quand l'utilisateur revient sur l'onglet apres absence, on verifie la version
+document.addEventListener("visibilitychange", function(){
+  if (document.visibilityState === "visible" && "serviceWorker" in navigator) {
+    navigator.serviceWorker.getRegistration().then(function(reg){
+      if (reg) reg.update().catch(function(){});
+    });
+  }
+});
 </script>
 
 <!-- Firebase SDK -->
@@ -296,6 +326,17 @@ function playChime() {
 <!-- React -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<!-- html2pdf pour la generation des PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<script>
+// ══════════════════════════════════════════════
+// ⚠️  CONFIGURATION ENVOI MAIL FACTURE  ⚠️
+// URL du Web App Apps Script (deploye en "Anyone")
+// ══════════════════════════════════════════════
+var MAIL_WEBAPP_URL = "https://script.google.com/macros/s/AKfycbzG3KXbYxToILMhT0HbRAdQ3hT2J8BOD9IcWMtK24PcQaJnCB-B5gV78lkv1irB2Ep2aQ/exec";
+var MAIL_WEBAPP_TOKEN = "Gina-Facture-Secret-K7x9P2qR-2026";
+</script>
 
 
 
@@ -357,12 +398,12 @@ const DEFAULT_SERVICES = [{
 }];
 const CAB = {
   name: "Réflexologie et Thérapie Manuelle",
-  owner: "Georgiana Villemot EI",
+  owner: "Georgiana Villemot",
   title: "Praticienne en Réflexologie et Thérapie Manuelle",
   address: "3 rue Jean Chamagne",
   city: "70220 Fougerolles",
   phone: "06 71 55 37 58",
-  email: "ginabogdan@ymail.com",
+  email: "ginavillemot@gmail.com",
   siret: "90398188400013",
   ape: "9609Z",
   legal: "Dispensé(e) d'immatriculation au RCS et au RM"
@@ -2264,11 +2305,110 @@ function InvoicesPage({
         return cl.id === preview.client.id;
       });
       if (c && c.email) to = c.email;
-      var lignes = preview.items.map(function (it) {
-        return "- " + it.name + " (" + it.duration + ") x" + (it.qty || 1) + " : " + (it.price * (it.qty || 1)).toFixed(2) + " EUR";
-      }).join("\n");
-      var body = "Bonjour " + (preview.client.firstname || preview.client.name) + ",\n\nVeuillez trouver ci-dessous votre facture.\n\n---\nFACTURE N. " + preview.number + "\nDate : " + fmtDate(preview.date) + "\n---\n\nEmise par :\n" + CAB.owner + "\n" + CAB.title + "\n" + CAB.address + "\n" + CAB.city + "\nTel : " + CAB.phone + "\nMail : " + CAB.email + "\nSIRET : " + CAB.siret + "\nCode APE : " + CAB.ape + "\n\nClient(e) : " + preview.client.name + (preview.client.firstname ? " " + preview.client.firstname : "") + "\n" + (preview.client.phone ? "Tel : " + preview.client.phone + "\n" : "") + (preview.client.address ? "Adresse : " + preview.client.address + "\n" : "") + "\nPrestations :\n" + lignes + "\n\nTOTAL : " + fmtEuro(preview.total) + "\n" + (preview.payMethod ? "Mode de paiement : " + preview.payMethod + "\n" : "") + (preview.paid ? "Statut : Payee\n" : "Statut : En attente\n") + "\nTVA non applicable, article 293 B du CGI\n" + CAB.legal + "\n---\n\nCordialement,\nGeorgiana Villemot\nTel : " + CAB.phone;
-      window.open("mailto:" + to + "?subject=" + encodeURIComponent("Facture " + preview.number + " - " + CAB.name) + "&body=" + encodeURIComponent(body));
+      if (!to) { alert("Pas d'email pour ce client. Renseignez l'email dans la fiche client."); return; }
+
+      if (MAIL_WEBAPP_URL === "VOTRE_WEBAPP_URL") {
+        alert("Configuration manquante : la URL du Web App n'est pas renseignée dans le code.");
+        return;
+      }
+
+      // Construire le HTML de la facture (meme template que l'impression)
+      var lignesHtml = preview.items.map(function(it){ return "<tr><td>" + it.name + "</td><td>" + it.duration + "</td><td>" + (it.qty||1) + "</td><td style='text-align:right;font-weight:600'>" + (it.price*(it.qty||1)).toFixed(2).replace(".",",") + " &euro;</td></tr>"; }).join("");
+      var clientStr = preview.client.name + (preview.client.firstname ? " " + preview.client.firstname : "");
+      var clientPhone = preview.client.phone ? preview.client.phone + "<br>" : "";
+      var clientAddr = preview.client.address ? preview.client.address + "<br>" : "";
+      var paidLine = preview.paid ? "<div style='margin-top:8px;font-size:13px;color:#7BA07E;font-weight:600;text-align:right'>&check; Payee</div>" : "<div style='margin-top:8px;font-size:13px;color:#C4A24E;font-weight:600;text-align:right'>En attente</div>";
+
+      var html = "<!DOCTYPE html><html><head><meta charset='utf-8'><style>" +
+        "*{margin:0;padding:0;box-sizing:border-box}" +
+        "body{font-family:Georgia,serif;color:#3E3650;background:#fff}" +
+        ".page{width:210mm;min-height:297mm;padding:25mm 22mm;display:flex;flex-direction:column}" +
+        ".header{text-align:center;margin-bottom:30px;padding-bottom:18px;border-bottom:2px solid #8B7CB8}" +
+        ".title{font-size:38px;font-weight:700;color:#6B5A9E;letter-spacing:.04em;font-style:italic}" +
+        ".num{font-size:13px;color:#9D93AE;margin-top:8px;letter-spacing:.06em;text-transform:uppercase}" +
+        ".parties{display:flex;justify-content:space-between;margin-bottom:30px;gap:30px}" +
+        ".party{flex:1}" +
+        ".pl{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#8B7CB8;font-weight:700;margin-bottom:12px}" +
+        ".pn{font-weight:700;font-size:16px;margin-bottom:4px}" +
+        ".ptitle{font-size:13px;color:#6B5A9E;font-style:italic;margin-bottom:8px}" +
+        ".pinfo{font-size:13px;color:#444;line-height:1.7}" +
+        ".plegal{font-size:11px;color:#9D93AE;line-height:1.6;margin-top:14px;font-style:italic}" +
+        ".date-row{display:flex;justify-content:space-between;margin-bottom:24px;padding:14px 0;border-top:1px solid #f0eaf5;border-bottom:1px solid #f0eaf5;font-size:13px}" +
+        ".date-row strong{color:#6B5A9E}" +
+        "table{width:100%;border-collapse:collapse;margin-bottom:24px}" +
+        "th{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#9D93AE;text-align:left;padding:14px 10px;border-bottom:2px solid #8B7CB8;font-weight:700}" +
+        "th:last-child{text-align:right}" +
+        "td{padding:18px 10px;border-bottom:1px solid #f0eaf5;font-size:13px}" +
+        "td:last-child{text-align:right;font-weight:600}" +
+        ".total-row{display:flex;justify-content:flex-end;align-items:center;margin-top:20px;padding:24px 0;border-top:2px solid #8B7CB8}" +
+        ".tlabel{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#9D93AE;margin-right:30px;font-weight:700}" +
+        ".tvalue{font-family:Georgia,serif;font-size:38px;font-weight:700;color:#6B5A9E}" +
+        ".spacer{flex:1}" +
+        ".footer{padding-top:18px;border-top:1px solid #f0eaf5;font-size:10px;color:#9D93AE;text-align:center;line-height:1.7;font-style:italic}" +
+        "</style></head><body>" +
+        "<div class='page'>" +
+        "<div class='header'><div class='title'>Facture</div><div class='num'>N&deg; " + preview.number + "</div></div>" +
+        "<div class='parties'>" +
+        "<div class='party'><div class='pl'>Facture par</div><div class='pn'>" + CAB.owner + "</div><div class='ptitle'>" + CAB.title + "</div>" +
+        "<div class='pinfo'>" + CAB.address + "<br>" + CAB.city + "<br>Tel : " + CAB.phone + "<br>Mail : " + CAB.email + "</div>" +
+        "<div class='plegal'>SIRET : " + CAB.siret + "<br>Code APE : " + CAB.ape + "<br>" + CAB.legal + "</div></div>" +
+        "<div class='party' style='text-align:right'><div class='pl'>Facture a</div><div class='pn'>" + clientStr + "</div>" +
+        "<div class='pinfo'>" + clientPhone + clientAddr + "</div></div>" +
+        "</div>" +
+        "<div class='date-row'><div><strong>Date :</strong> " + fmtDate(preview.date) + "</div><div><strong>Mode de paiement :</strong> " + (preview.payMethod || "—") + "</div></div>" +
+        "<table><thead><tr><th>Prestation</th><th>Duree</th><th>Qte</th><th>Prix</th></tr></thead><tbody>" + lignesHtml + "</tbody></table>" +
+        "<div class='total-row'><div class='tlabel'>Total a payer</div><div class='tvalue'>" + preview.total.toFixed(2).replace(".",",") + " &euro;</div></div>" +
+        paidLine +
+        "<div class='spacer'></div>" +
+        "<div class='footer'>" + CAB.owner + " &mdash; SIRET : " + CAB.siret + " &mdash; Code APE : " + CAB.ape + "<br>" + CAB.address + ", " + CAB.city + " &mdash; Tel : " + CAB.phone + "<br>TVA non applicable, article 293 B du CGI</div>" +
+        "</div></body></html>";
+
+      // Generation du PDF puis envoi
+      var btn = window.event.target;
+      var originalText = btn.textContent;
+      btn.textContent = "Envoi en cours...";
+      btn.disabled = true;
+
+      var container = document.createElement("div");
+      container.innerHTML = html;
+      container.style.position = "fixed";
+      container.style.left = "-10000px";
+      document.body.appendChild(container);
+
+      var opt = {
+        margin: 0,
+        filename: "facture-" + preview.number + ".pdf",
+        image: { type: "jpeg", quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+      };
+
+      window.html2pdf().set(opt).from(container.firstElementChild).outputPdf("datauristring").then(function(dataUri){
+        document.body.removeChild(container);
+        var base64 = dataUri.split(",")[1];
+        return fetch(MAIL_WEBAPP_URL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: {"Content-Type": "text/plain"},
+          body: JSON.stringify({
+            token: MAIL_WEBAPP_TOKEN,
+            to: to,
+            clientName: preview.client.firstname || preview.client.name,
+            invoiceNumber: preview.number,
+            total: fmtEuro(preview.total),
+            pdfBase64: base64
+          })
+        });
+      }).then(function(){
+        btn.textContent = originalText;
+        btn.disabled = false;
+        alert("Facture envoyee !");
+      }).catch(function(err){
+        try { document.body.removeChild(container); } catch(e){}
+        btn.textContent = originalText;
+        btn.disabled = false;
+        alert("Erreur d'envoi : " + err.message);
+      });
     }
   }, "\uD83D\uDCE7 Envoyer par mail"), /*#__PURE__*/React.createElement("button", {
     className: "btn btn-primary",
