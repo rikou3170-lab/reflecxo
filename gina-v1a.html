@@ -221,7 +221,7 @@ link.href = URL.createObjectURL(blob);
 document.head.appendChild(link);
 
 // ─── Versioning + Force reload ───
-var APP_VERSION = "v2.8 - bon email compact";
+var APP_VERSION = "v2.9 - bon email A4 fixe";
 console.log("Gina app version:", APP_VERSION);
 
 // ─── Service Worker ───
@@ -706,7 +706,8 @@ function pdfFallback(innerHtml, filename) {
     filename: filename,
     image: { type: "jpeg", quality: 0.98 },
     html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: "#ffffff" },
-    jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+    jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+    pagebreak: { mode: ["avoid-all"] }
   };
   var waitFonts = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
   waitFonts.then(function(){
@@ -2704,24 +2705,24 @@ function BonCadeauPage({
   var buildBonHtml = function(forPrint) {
     var pageCSS = forPrint ? "@page{size:A4 portrait;margin:0}" : "";
     var screenCSS = forPrint ? "body{background:#E5E1EC;padding:24px 0}.sheet{margin:0 auto;box-shadow:0 4px 30px rgba(62,54,80,.2)}@media print{body{background:#fff;padding:0}.sheet{box-shadow:none;margin:0}}" : "";
-    // Impression : pleine page A4 avec centrage vertical (display:table).
-    // PDF email (capture html2canvas) : largeur A4, hauteur naturelle, version compacte (marge de securite).
+    // Impression : pleine page A4, centrage vertical.
+    // PDF email : boite A4 FIXE 794x1108px (legerement < 1123 pour eviter l'arrondi html2pdf qui ferait 2 pages), contenu centre.
     var sheetCSS = forPrint
       ? ".sheet{width:210mm;min-height:297mm;display:table;background:#fff}.cell{display:table-cell;vertical-align:middle;text-align:center;padding:16mm}"
-      : ".sheet{width:794px;background:#fff;padding:14mm 16mm}.cell{text-align:center}";
-    // Overrides compacts uniquement pour le PDF email (evite toute coupure)
+      : ".sheet{width:794px;height:1108px;display:table;background:#fff}.cell{display:table-cell;vertical-align:middle;text-align:center;padding:14mm 16mm}";
+    // Overrides compacts pour le PDF email (evite toute coupure)
     var compactCSS = forPrint ? "" :
-      ".bon{padding:14mm 16mm}" +
-      ".ornament-top{margin-bottom:4mm}" +
-      ".maintitle{font-size:46px;margin-bottom:3mm}" +
+      ".bon{padding:16mm 16mm}" +
+      ".ornament-top{margin-bottom:5mm}" +
+      ".maintitle{font-size:50px;margin-bottom:3mm}" +
       ".divider{margin:4mm auto}" +
       ".subtitle{margin-bottom:5mm}" +
-      ".benef{margin-bottom:4mm}" +
-      ".lotus-wrap{margin:2mm 0 4mm}.lotus-wrap img{width:105px}" +
+      ".benef{margin-bottom:5mm}" +
+      ".lotus-wrap{margin:3mm 0 5mm}.lotus-wrap img{width:110px}" +
       ".validite{margin-bottom:2mm}" +
       ".datelimite{margin-bottom:5mm}" +
       ".msg-zone{margin:0 auto 5mm}" +
-      ".footer{padding-top:4mm}";
+      ".footer{padding-top:5mm}";
     return "<style>" + pageCSS +
       "*{margin:0;padding:0;box-sizing:border-box}" +
       "html,body{font-family:'Quicksand',Arial,sans-serif;color:#3E3650;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}" +
@@ -3145,7 +3146,8 @@ function BonCadeauPage({
         filename: "bon-cadeau.pdf",
         image: { type: "jpeg", quality: 0.98 },
         html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: "#ffffff" },
-        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+        jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+        pagebreak: { mode: ["avoid-all"] }
       };
 
       var waitFonts = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
