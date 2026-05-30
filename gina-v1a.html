@@ -221,7 +221,7 @@ link.href = URL.createObjectURL(blob);
 document.head.appendChild(link);
 
 // ─── Versioning + Force reload ───
-var APP_VERSION = "v2.7 - bons liste";
+var APP_VERSION = "v2.8 - bon email compact";
 console.log("Gina app version:", APP_VERSION);
 
 // ─── Service Worker ───
@@ -708,13 +708,16 @@ function pdfFallback(innerHtml, filename) {
     html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: "#ffffff" },
     jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
   };
-  setTimeout(function(){
-    window.html2pdf().set(opt).from(target).save().then(function(){
-      try { document.body.removeChild(container); } catch(e){}
-    }).catch(function(){
-      try { document.body.removeChild(container); } catch(e){}
-    });
-  }, 200);
+  var waitFonts = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+  waitFonts.then(function(){
+    setTimeout(function(){
+      window.html2pdf().set(opt).from(target).save().then(function(){
+        try { document.body.removeChild(container); } catch(e){}
+      }).catch(function(){
+        try { document.body.removeChild(container); } catch(e){}
+      });
+    }, 200);
+  });
 }
 
 function doPrint(inv) {
@@ -2437,7 +2440,9 @@ function InvoicesPage({
       };
 
       // Petit delai pour laisser le DOM se rendre avant la capture
-      setTimeout(function(){
+      var waitFonts = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+      waitFonts.then(function(){
+        setTimeout(function(){
         window.html2pdf().set(opt).from(target).outputPdf("datauristring").then(function(dataUri){
         document.body.removeChild(container);
         var base64 = dataUri.split(",")[1];
@@ -2448,7 +2453,7 @@ function InvoicesPage({
           body: JSON.stringify({
             token: MAIL_WEBAPP_TOKEN,
             to: to,
-            clientName: preview.client.firstname || preview.client.name,
+            clientName: (preview.client && (preview.client.firstname || preview.client.name)) || "",
             invoiceNumber: preview.number,
             total: fmtEuro(preview.total),
             pdfBase64: base64
@@ -2465,6 +2470,7 @@ function InvoicesPage({
         alert("Erreur d'envoi : " + err.message);
       });
       }, 200);
+      });
     }
   }, "\uD83D\uDCE7 Envoyer par mail"), /*#__PURE__*/React.createElement("button", {
     className: "btn btn-primary",
@@ -2699,10 +2705,23 @@ function BonCadeauPage({
     var pageCSS = forPrint ? "@page{size:A4 portrait;margin:0}" : "";
     var screenCSS = forPrint ? "body{background:#E5E1EC;padding:24px 0}.sheet{margin:0 auto;box-shadow:0 4px 30px rgba(62,54,80,.2)}@media print{body{background:#fff;padding:0}.sheet{box-shadow:none;margin:0}}" : "";
     // Impression : pleine page A4 avec centrage vertical (display:table).
-    // PDF email (capture html2canvas) : largeur A4 mais hauteur NATURELLE (sinon 2 pages).
+    // PDF email (capture html2canvas) : largeur A4, hauteur naturelle, version compacte (marge de securite).
     var sheetCSS = forPrint
       ? ".sheet{width:210mm;min-height:297mm;display:table;background:#fff}.cell{display:table-cell;vertical-align:middle;text-align:center;padding:16mm}"
-      : ".sheet{width:794px;background:#fff;padding:24mm 16mm}.cell{text-align:center}";
+      : ".sheet{width:794px;background:#fff;padding:14mm 16mm}.cell{text-align:center}";
+    // Overrides compacts uniquement pour le PDF email (evite toute coupure)
+    var compactCSS = forPrint ? "" :
+      ".bon{padding:14mm 16mm}" +
+      ".ornament-top{margin-bottom:4mm}" +
+      ".maintitle{font-size:46px;margin-bottom:3mm}" +
+      ".divider{margin:4mm auto}" +
+      ".subtitle{margin-bottom:5mm}" +
+      ".benef{margin-bottom:4mm}" +
+      ".lotus-wrap{margin:2mm 0 4mm}.lotus-wrap img{width:105px}" +
+      ".validite{margin-bottom:2mm}" +
+      ".datelimite{margin-bottom:5mm}" +
+      ".msg-zone{margin:0 auto 5mm}" +
+      ".footer{padding-top:4mm}";
     return "<style>" + pageCSS +
       "*{margin:0;padding:0;box-sizing:border-box}" +
       "html,body{font-family:'Quicksand',Arial,sans-serif;color:#3E3650;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}" +
@@ -2728,6 +2747,7 @@ function BonCadeauPage({
       ".footer{width:100%;border-top:1px solid #E0D5EE;padding-top:6mm;margin-top:2mm}" +
       ".footer-logo{font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;font-weight:600;font-style:italic;color:#8B7CB8;margin-bottom:2mm}" +
       ".footer-info{font-size:11px;color:#A99FBC;line-height:1.7;letter-spacing:.3px}" +
+      compactCSS +
       ".footer-info .nom{font-weight:600;color:#6B617E;font-size:12px}" +
       "</style>" +
       "<div class='sheet'><div class='cell'><div class='bon'>" +
@@ -3128,12 +3148,14 @@ function BonCadeauPage({
         jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
       };
 
-      setTimeout(function(){
-        window.html2pdf().set(opt).from(target).outputPdf("datauristring").then(function(dataUri){
-          document.body.removeChild(container);
-          var base64 = dataUri.split(",")[1];
-          return fetch(MAIL_WEBAPP_URL, {
-            method: "POST",
+      var waitFonts = (document.fonts && document.fonts.ready) ? document.fonts.ready : Promise.resolve();
+      waitFonts.then(function(){
+        setTimeout(function(){
+          window.html2pdf().set(opt).from(target).outputPdf("datauristring").then(function(dataUri){
+            document.body.removeChild(container);
+            var base64 = dataUri.split(",")[1];
+            return fetch(MAIL_WEBAPP_URL, {
+              method: "POST",
             mode: "no-cors",
             headers: {"Content-Type": "text/plain"},
             body: JSON.stringify({
@@ -3158,6 +3180,7 @@ function BonCadeauPage({
           alert("Erreur d'envoi : " + err.message);
         });
       }, 200);
+      });
     },
     style: {
       width: "100%",
