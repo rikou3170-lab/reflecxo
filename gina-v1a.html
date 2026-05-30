@@ -221,7 +221,7 @@ link.href = URL.createObjectURL(blob);
 document.head.appendChild(link);
 
 // ─── Versioning + Force reload ───
-var APP_VERSION = "v1.6 - PDF bon cadeau";
+var APP_VERSION = "v2.5 - audit";
 console.log("Gina app version:", APP_VERSION);
 
 // ─── Service Worker ───
@@ -287,7 +287,7 @@ var AUTH_EMAIL = "gina@reflexo.app";
 // Cache locale + sync Firestore
 function localGet(key) { try { return JSON.parse(localStorage.getItem(key)) || []; } catch(e) { return []; } }
 function localSet(key, data) {
-  localStorage.setItem(key, JSON.stringify(data));
+  try { localStorage.setItem(key, JSON.stringify(data)); } catch(e) {}
   db.doc("data/" + key).set({items: data}).catch(function(e){ console.error(e); });
 }
 async function localLoad(key, fallback) {
@@ -295,7 +295,7 @@ async function localLoad(key, fallback) {
     var snap = await db.doc("data/" + key).get();
     if (snap.exists && snap.data().items) {
       var items = snap.data().items;
-      localStorage.setItem(key, JSON.stringify(items));
+      try { localStorage.setItem(key, JSON.stringify(items)); } catch(e) {}
       return items;
     }
     return fallback;
@@ -396,6 +396,7 @@ const DEFAULT_SERVICES = [{
   price: 40,
   desc: "Rééquilibrage énergétique global"
 }];
+const LOTUS_IMG = "data:image/png;base64,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";
 const CAB = {
   name: "Réflexologie et Thérapie Manuelle",
   owner: "Georgiana Villemot",
@@ -615,28 +616,125 @@ function Lotus({
 }
 
 // ─── PRINT ───
-function doPrint(inv) {
+function buildFactureHtml(inv, forScreen) {
   var rows = "";
-  for (var i = 0; i < inv.items.length; i++) {
-    var it = inv.items[i],
-      q = it.qty || 1;
-    rows += "<tr><td>" + it.name + "</td><td>" + it.duration + "</td><td>" + q + "</td><td style='text-align:right;font-weight:600'>" + (it.price * q).toFixed(2) + " €</td></tr>";
+  var items = inv.items || [];
+  for (var i = 0; i < items.length; i++) {
+    var it = items[i], q = it.qty || 1;
+    rows += "<tr><td>" + (it.name || "") + "</td><td>" + (it.duration || "") + "</td><td>" + q + "</td><td>" + ((it.price || 0) * q).toFixed(2).replace(".", ",") + " &euro;</td></tr>";
   }
-  var payLine = inv.payMethod ? "<div><span class='dl'>Mode paiement : </span><span class='dv'>" + inv.payMethod + "</span></div>" : "";
-  var paidLine = inv.paid !== undefined ? "<div class='pi'>" + (inv.paid ? "Payée" : "En attente de paiement") + "</div>" : "";
-  var noteLine = inv.note ? "<div class='nt'>Note : " + inv.note + "</div>" : "";
-  var cPhone = inv.client.phone ? "<div class='pi2'>" + inv.client.phone + "</div>" : "";
-  var cAddr = inv.client.address ? "<div class='pi2'>" + inv.client.address + "</div>" : "";
-  var h = ["<!DOCTYPE html><html><head><meta charset='utf-8'><title>Facture " + inv.number + "</title>", "<link href='https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Quicksand:wght@400;500;600;700&display=swap' rel='stylesheet'>", "<style>@page{size:A4;margin:20mm}*{margin:0;padding:0;box-sizing:border-box}", "body{font-family:'Quicksand',sans-serif;color:#3E3650;padding:40px;max-width:800px;margin:0 auto}", ".tt{text-align:center;margin-bottom:30px}.tt h1{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:700;color:#6B5A9E}.tt .nm{font-size:12px;color:#9D93AE;margin-top:4px}", ".pa{display:flex;justify-content:space-between;margin-bottom:28px}", ".pl{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#8B7CB8;font-weight:700;margin-bottom:8px}", ".pn{font-weight:600;font-size:14px}.pt{font-size:12px;color:#6B5A9E;font-style:italic;margin-bottom:4px}", ".pi2{font-size:12px;color:#9D93AE;line-height:1.8}.plg{font-size:11px;color:#9D93AE;line-height:1.7;margin-top:8px}", ".dr{display:flex;justify-content:space-between;margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid #F3EFF9}", ".dl{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:#9D93AE;font-weight:700}.dv{font-size:13px;font-weight:500}", "table{width:100%;border-collapse:collapse;margin-top:8px}th{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:#9D93AE;text-align:left;padding:10px 8px;border-bottom:2px solid #E8E0F0;font-weight:700}", "td{padding:12px 8px;border-bottom:1px solid #F0EAF5;font-size:13px;font-weight:500}", ".tr{display:flex;justify-content:flex-end;align-items:center;margin-top:16px;padding-top:14px;border-top:2px solid #8B7CB8}", ".tl{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#9D93AE;margin-right:20px;font-weight:700}", ".tv{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;color:#6B5A9E}", ".pi{text-align:right;font-size:12px;color:#9D93AE;margin-top:8px;font-weight:500}", ".nt{font-size:12px;color:#9D93AE;margin-top:12px;font-style:italic}", ".ft{margin-top:40px;padding-top:14px;border-top:1px solid #F0EAF5;font-size:10px;color:#9D93AE;text-align:center;line-height:1.8;font-weight:500}", "</style></head><body>", "<div class='tt'><h1>Facture</h1><div class='nm'>" + inv.number + "</div></div>", "<div class='pa'><div>", "<div class='pl'>Facturé par</div><div class='pn'>" + CAB.owner + "</div><div class='pt'>" + CAB.title + "</div>", "<div class='pi2'>" + CAB.address + "<br>" + CAB.city + "<br>Tél : " + CAB.phone + "<br>Mail : " + CAB.email + "</div>", "<div class='plg'>SIRET : " + CAB.siret + "<br>Code APE : " + CAB.ape + "<br>" + CAB.legal + "</div>", "</div><div style='text-align:right'>", "<div class='pl'>Facturé à</div><div class='pn'>" + inv.client.name + (inv.client.firstname ? " " + inv.client.firstname : "") + "</div>" + cPhone + cAddr, "</div></div>", "<div class='dr'><div><span class='dl'>Date : </span><span class='dv'>" + fmtDate(inv.date) + "</span></div>" + payLine + "</div>", "<table><thead><tr><th>Prestation</th><th>Durée</th><th>Qté</th><th style='text-align:right'>Prix</th></tr></thead><tbody>" + rows + "</tbody></table>", "<div class='tr'><span class='tl'>Total</span><span class='tv'>" + fmtEuro(inv.total) + "</span></div>", paidLine, noteLine, "<div class='ft'>" + CAB.owner + " — SIRET : " + CAB.siret + " — Code APE : " + CAB.ape + "<br>" + CAB.address + ", " + CAB.city + " — Tél : " + CAB.phone + "<br>TVA non applicable, article 293 B du CGI</div>", "</body></html>"].join("\n");
+  var cl = inv.client || {};
+  var clientStr = (cl.name || "Client") + (cl.firstname ? " " + cl.firstname : "");
+  var cPhone = cl.phone ? cl.phone + "<br>" : "";
+  var cAddr = cl.address ? cl.address + "<br>" : "";
+  var statusBadge = inv.paid !== undefined ? (inv.paid ? "<div class='status'><span class='badge paid'>&check; Pay\u00E9e</span></div>" : "<div class='status'><span class='badge pending'>En attente de paiement</span></div>") : "";
+  var screenCSS = forScreen ? "body{background:#E5E1EC;padding:24px 0}.page{margin:0 auto;box-shadow:0 4px 30px rgba(62,54,80,.2)}@media print{body{background:#fff;padding:0}.page{box-shadow:none;margin:0}}" : "body{background:#fff}";
+  return "<style>" +
+    "@page{size:A4 portrait;margin:0}" +
+    "*{margin:0;padding:0;box-sizing:border-box}" +
+    "html,body{font-family:'Quicksand',Arial,sans-serif;color:#3E3650;-webkit-print-color-adjust:exact;print-color-adjust:exact}" +
+    screenCSS +
+    ".page{width:210mm;min-height:297mm;position:relative;padding:20mm 18mm 38mm;background:#fff}" +
+    ".tt{text-align:center;margin-bottom:12mm}" +
+    ".tt h1{font-family:'Cormorant Garamond',Georgia,serif;font-size:44px;font-weight:700;font-style:italic;color:#6B5A9E}" +
+    ".tt .nm{font-size:12px;color:#9D93AE;margin-top:6px;letter-spacing:2px}" +
+    ".pa{width:100%;margin-bottom:11mm;border-collapse:collapse}" +
+    ".pa td{vertical-align:top;width:50%}" +
+    ".pa td.r{text-align:right}" +
+    ".pl{font-size:10px;text-transform:uppercase;letter-spacing:2px;color:#8B7CB8;font-weight:700;margin-bottom:9px}" +
+    ".pn{font-family:'Cormorant Garamond',Georgia,serif;font-weight:600;font-size:20px;color:#6B5A9E}" +
+    ".pt{font-size:12px;color:#8B7CB8;font-style:italic;margin:2px 0 7px}" +
+    ".pi2{font-size:13px;color:#6B617E;line-height:1.85}" +
+    ".plg{font-size:11px;color:#A99FBC;line-height:1.7;margin-top:9px}" +
+    ".dr{width:100%;background:#F6F2FB;border-radius:8px;border-collapse:collapse;margin-bottom:10mm}" +
+    ".dr td{padding:6mm 8mm;width:50%}" +
+    ".dr td.r{text-align:right}" +
+    ".dl{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:#A99FBC;font-weight:700;margin-bottom:4px}" +
+    ".dv{font-size:15px;font-weight:600;color:#3E3650}" +
+    "table.items{width:100%;border-collapse:collapse;margin-bottom:9mm}" +
+    "table.items th{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:#fff;background:#8B7CB8;text-align:left;padding:13px 16px;font-weight:700}" +
+    "table.items th:last-child{text-align:right}" +
+    "table.items td{padding:16px;border-bottom:1px solid #EDE7F5;font-size:14px;font-weight:500}" +
+    "table.items td:last-child{text-align:right;font-weight:600;color:#3E3650}" +
+    "table.items tr:nth-child(even) td{background:#FBF9FE}" +
+    ".tot{width:100%;border-collapse:collapse;margin-bottom:5mm}" +
+    ".tot td.sp{width:50%}" +
+    ".tot td.box{width:50%;background:#F6F2FB;border-radius:10px;padding:6mm 8mm}" +
+    ".tot .tl{font-size:11px;text-transform:uppercase;letter-spacing:1.5px;color:#8B7CB8;font-weight:700}" +
+    ".tot .tv{font-family:'Cormorant Garamond',Georgia,serif;font-size:34px;font-weight:700;color:#6B5A9E;text-align:right;white-space:nowrap}" +
+    ".status{text-align:right}" +
+    ".status .badge{display:inline-block;border-radius:20px;padding:6px 20px;font-size:13px;font-weight:600}" +
+    ".status .badge.paid{background:#EDF5EE;color:#5E8A62}" +
+    ".status .badge.pending{background:#FBF3E4;color:#B58A3C}" +
+    ".ft{position:absolute;left:0;right:0;bottom:0;background:#F6F2FB;border-top:2px solid #C4B0E0;padding:7mm 18mm;text-align:center;font-size:10.5px;color:#A99FBC;line-height:1.85}" +
+    ".ft .lg{font-family:'Cormorant Garamond',Georgia,serif;font-size:15px;font-style:italic;font-weight:600;color:#8B7CB8;margin-bottom:3px}" +
+    "</style>" +
+    "<div class='page'>" +
+    "<div class='tt'><h1>Facture</h1><div class='nm'>N&deg; " + inv.number + "</div></div>" +
+    "<table class='pa'><tr>" +
+    "<td><div class='pl'>Factur\u00E9 par</div><div class='pn'>" + CAB.owner + "</div><div class='pt'>" + CAB.title + "</div>" +
+    "<div class='pi2'>" + CAB.address + "<br>" + CAB.city + "<br>T\u00E9l : " + CAB.phone + "<br>Mail : " + CAB.email + "</div>" +
+    "<div class='plg'>SIRET : " + CAB.siret + " &middot; Code APE : " + CAB.ape + "<br>" + CAB.legal + "</div></td>" +
+    "<td class='r'><div class='pl'>Factur\u00E9 \u00E0</div><div class='pn'>" + clientStr + "</div>" +
+    "<div class='pi2'>" + cPhone + cAddr + "</div></td>" +
+    "</tr></table>" +
+    "<table class='dr'><tr>" +
+    "<td><div class='dl'>Date</div><div class='dv'>" + fmtDate(inv.date) + "</div></td>" +
+    "<td class='r'><div class='dl'>Mode de paiement</div><div class='dv'>" + (inv.payMethod || "&mdash;") + "</div></td>" +
+    "</tr></table>" +
+    "<table class='items'><thead><tr><th>Prestation</th><th>Dur\u00E9e</th><th>Qt\u00E9</th><th>Prix</th></tr></thead><tbody>" + rows + "</tbody></table>" +
+    "<table class='tot'><tr><td class='sp'></td><td class='box'><table style='width:100%;border-collapse:collapse'><tr><td class='tl'>Total \u00E0 payer</td><td class='tv'>" + fmtEuro(inv.total) + "</td></tr></table></td></tr></table>" +
+    statusBadge +
+    "<div class='ft'><div class='lg'>R\u00E9flexologie et Th\u00E9rapie Manuelle</div>" +
+    CAB.owner + " &middot; SIRET " + CAB.siret + " &middot; Code APE " + CAB.ape + "<br>" +
+    CAB.address + ", " + CAB.city + " &middot; " + CAB.phone + "<br>TVA non applicable, article 293 B du CGI</div>" +
+    "</div>";
+}
+
+function pdfFallback(innerHtml, filename) {
+  // Solution de secours iOS : genere un PDF telechargeable
+  var container = document.createElement("div");
+  container.innerHTML = innerHtml;
+  container.style.position = "absolute";
+  container.style.top = "0";
+  container.style.left = "0";
+  container.style.zIndex = "-99999";
+  document.body.appendChild(container);
+  var target = container.querySelector(".page") || container.querySelector(".sheet");
+  var opt = {
+    margin: 0,
+    filename: filename,
+    image: { type: "jpeg", quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: "#ffffff" },
+    jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+  };
+  setTimeout(function(){
+    window.html2pdf().set(opt).from(target).save().then(function(){
+      try { document.body.removeChild(container); } catch(e){}
+    }).catch(function(){
+      try { document.body.removeChild(container); } catch(e){}
+    });
+  }, 200);
+}
+
+function doPrint(inv) {
+  var inner = buildFactureHtml(inv, true);
+  var h = "<!DOCTYPE html><html><head><meta charset='utf-8'><title>Facture " + inv.number + "</title>" +
+    "<link href='https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Quicksand:wght@400;500;600;700&display=swap' rel='stylesheet'>" +
+    "</head><body>" + inner + "</body></html>";
   var w = window.open("", "_blank");
   if (w) {
     w.document.write(h);
     w.document.close();
     setTimeout(function () {
       w.print();
-    }, 500);
+    }, 600);
+  } else {
+    // iOS / popup bloque : PDF telechargeable
+    pdfFallback(buildFactureHtml(inv, false), "facture-" + inv.number + ".pdf");
   }
 }
+
 
 // ═══════════════ COMPONENTS ═══════════════
 
@@ -1716,7 +1814,7 @@ function InvoicesPage({
   };
   var openEdit = function (inv) {
     setEditingId(inv.id);
-    setSelClient(inv.client.id || "");
+    setSelClient(inv.client && inv.client.id ? inv.client.id : "");
     setItems((inv.items || []).map(function (it, i) {
       var svc = services.find(function (s) {
         return s.name === it.name;
@@ -2003,7 +2101,7 @@ function InvoicesPage({
       onClick: function () {
         setPreview(inv);
       }
-    }, /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("strong", null, inv.number)), /*#__PURE__*/React.createElement("td", null, fmtDate(inv.date)), /*#__PURE__*/React.createElement("td", null, inv.client.name, inv.client.firstname ? " " + inv.client.firstname : ""), /*#__PURE__*/React.createElement("td", {
+    }, /*#__PURE__*/React.createElement("td", null, /*#__PURE__*/React.createElement("strong", null, inv.number)), /*#__PURE__*/React.createElement("td", null, fmtDate(inv.date)), /*#__PURE__*/React.createElement("td", null, inv.client ? (inv.client.name || "") + (inv.client.firstname ? " " + inv.client.firstname : "") : "\u2014"), /*#__PURE__*/React.createElement("td", {
       style: {
         fontWeight: 700
       }
@@ -2299,7 +2397,7 @@ function InvoicesPage({
     }
   }, "Modifier"), preview.client && /*#__PURE__*/React.createElement("button", {
     className: "btn btn-secondary",
-    onClick: function () {
+    onClick: function (ev) {
       var to = "";
       var c = clients.find(function (cl) {
         return cl.id === preview.client.id;
@@ -2312,80 +2410,23 @@ function InvoicesPage({
         return;
       }
 
-      // Construire le HTML de la facture (meme template que l'impression)
-      var lignesHtml = preview.items.map(function(it){ return "<tr><td>" + it.name + "</td><td>" + it.duration + "</td><td>" + (it.qty||1) + "</td><td style='text-align:right;font-weight:600'>" + (it.price*(it.qty||1)).toFixed(2).replace(".",",") + " &euro;</td></tr>"; }).join("");
-      var clientStr = preview.client.name + (preview.client.firstname ? " " + preview.client.firstname : "");
-      var clientPhone = preview.client.phone ? preview.client.phone + "<br>" : "";
-      var clientAddr = preview.client.address ? preview.client.address + "<br>" : "";
-      var paidLine = preview.paid ? "<div style='margin-top:8px;font-size:13px;color:#7BA07E;font-weight:600;text-align:right'>&check; Payee</div>" : "<div style='margin-top:8px;font-size:13px;color:#C4A24E;font-weight:600;text-align:right'>En attente</div>";
-
-      var styles = "<style>" +
-        "*{margin:0;padding:0;box-sizing:border-box}" +
-        ".pdfwrap{font-family:Georgia,serif;color:#3E3650;background:#fff;width:794px;padding:60px 50px}" +
-        ".pdfwrap .header{text-align:center;margin-bottom:30px;padding-bottom:18px;border-bottom:2px solid #8B7CB8}" +
-        ".pdfwrap .title{font-size:38px;font-weight:700;color:#6B5A9E;letter-spacing:2px;font-style:italic}" +
-        ".pdfwrap .num{font-size:13px;color:#9D93AE;margin-top:8px;letter-spacing:1px;text-transform:uppercase}" +
-        ".pdfwrap .parties{display:table;width:100%;margin-bottom:30px}" +
-        ".pdfwrap .party-left,.pdfwrap .party-right{display:table-cell;vertical-align:top;width:50%}" +
-        ".pdfwrap .party-right{text-align:right}" +
-        ".pdfwrap .pl{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#8B7CB8;font-weight:700;margin-bottom:12px}" +
-        ".pdfwrap .pn{font-weight:700;font-size:16px;margin-bottom:4px}" +
-        ".pdfwrap .ptitle{font-size:13px;color:#6B5A9E;font-style:italic;margin-bottom:8px}" +
-        ".pdfwrap .pinfo{font-size:13px;color:#444;line-height:1.7}" +
-        ".pdfwrap .plegal{font-size:11px;color:#9D93AE;line-height:1.6;margin-top:14px;font-style:italic}" +
-        ".pdfwrap .date-row{display:table;width:100%;margin-bottom:24px;padding:14px 0;border-top:1px solid #f0eaf5;border-bottom:1px solid #f0eaf5;font-size:13px}" +
-        ".pdfwrap .date-row > div{display:table-cell;width:50%}" +
-        ".pdfwrap .date-row > div:last-child{text-align:right}" +
-        ".pdfwrap .date-row strong{color:#6B5A9E}" +
-        ".pdfwrap table{width:100%;border-collapse:collapse;margin-bottom:24px}" +
-        ".pdfwrap th{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#9D93AE;text-align:left;padding:14px 10px;border-bottom:2px solid #8B7CB8;font-weight:700}" +
-        ".pdfwrap th:last-child{text-align:right}" +
-        ".pdfwrap td{padding:18px 10px;border-bottom:1px solid #f0eaf5;font-size:13px}" +
-        ".pdfwrap td:last-child{text-align:right;font-weight:600}" +
-        ".pdfwrap .total-row{text-align:right;margin-top:20px;padding:24px 0;border-top:2px solid #8B7CB8}" +
-        ".pdfwrap .tlabel{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:#9D93AE;margin-right:30px;font-weight:700}" +
-        ".pdfwrap .tvalue{font-family:Georgia,serif;font-size:38px;font-weight:700;color:#6B5A9E;display:inline-block;vertical-align:middle}" +
-        ".pdfwrap .paid{margin-top:8px;font-size:13px;color:#7BA07E;font-weight:600;text-align:right}" +
-        ".pdfwrap .pending{margin-top:8px;font-size:13px;color:#C4A24E;font-weight:600;text-align:right}" +
-        ".pdfwrap .footer{margin-top:60px;padding-top:18px;border-top:1px solid #f0eaf5;font-size:10px;color:#9D93AE;text-align:center;line-height:1.7;font-style:italic}" +
-        "</style>";
-
-      var bodyHtml = "<div class='pdfwrap'>" +
-        "<div class='header'><div class='title'>Facture</div><div class='num'>N&deg; " + preview.number + "</div></div>" +
-        "<div class='parties'>" +
-        "<div class='party-left'><div class='pl'>Facture par</div><div class='pn'>" + CAB.owner + "</div><div class='ptitle'>" + CAB.title + "</div>" +
-        "<div class='pinfo'>" + CAB.address + "<br>" + CAB.city + "<br>Tel : " + CAB.phone + "<br>Mail : " + CAB.email + "</div>" +
-        "<div class='plegal'>SIRET : " + CAB.siret + "<br>Code APE : " + CAB.ape + "<br>" + CAB.legal + "</div></div>" +
-        "<div class='party-right'><div class='pl'>Facture a</div><div class='pn'>" + clientStr + "</div>" +
-        "<div class='pinfo'>" + clientPhone + clientAddr + "</div></div>" +
-        "</div>" +
-        "<div class='date-row'><div><strong>Date :</strong> " + fmtDate(preview.date) + "</div><div><strong>Mode de paiement :</strong> " + (preview.payMethod || "—") + "</div></div>" +
-        "<table><thead><tr><th>Prestation</th><th>Duree</th><th>Qte</th><th>Prix</th></tr></thead><tbody>" + lignesHtml + "</tbody></table>" +
-        "<div class='total-row'><span class='tlabel'>Total a payer</span><span class='tvalue'>" + preview.total.toFixed(2).replace(".",",") + " &euro;</span></div>" +
-        (preview.paid ? "<div class='paid'>&check; Payee</div>" : "<div class='pending'>En attente</div>") +
-        "<div class='footer'>" + CAB.owner + " &mdash; SIRET : " + CAB.siret + " &mdash; Code APE : " + CAB.ape + "<br>" + CAB.address + ", " + CAB.city + " &mdash; Tel : " + CAB.phone + "<br>TVA non applicable, article 293 B du CGI</div>" +
-        "</div>";
+      // Construire le HTML de la facture (meme design que l'impression)
+      var factureInner = buildFactureHtml(preview, false);
 
       // Generation du PDF puis envoi
-      var btn = window.event.target;
+      var btn = ev.currentTarget;
       var originalText = btn.textContent;
       btn.textContent = "Envoi en cours...";
       btn.disabled = true;
 
-      // Injecte les styles dans le head
-      var styleEl = document.createElement("div");
-      styleEl.innerHTML = styles;
-      document.head.appendChild(styleEl.firstElementChild);
-
-      // Cree le wrapper visible mais hors champ
       var container = document.createElement("div");
-      container.innerHTML = bodyHtml;
+      container.innerHTML = factureInner;
       container.style.position = "absolute";
       container.style.top = "0";
       container.style.left = "0";
       container.style.zIndex = "-99999";
       document.body.appendChild(container);
-      var target = container.firstElementChild;
+      var target = container.querySelector(".page");
 
       var opt = {
         margin: 0,
@@ -2654,15 +2695,69 @@ function BonCadeauPage({
     month: "2-digit",
     year: "numeric"
   });
+  var buildBonHtml = function(forPrint) {
+    var pageCSS = forPrint ? "@page{size:A4 portrait;margin:0}" : "";
+    var wrapCSS = forPrint ? "width:210mm;min-height:297mm" : "width:794px;height:1123px";
+    var screenCSS = forPrint ? "body{background:#E5E1EC;padding:24px 0}.sheet{margin:0 auto;box-shadow:0 4px 30px rgba(62,54,80,.2)}@media print{body{background:#fff;padding:0}.sheet{box-shadow:none;margin:0}}" : "";
+    return "<style>" + pageCSS +
+      "*{margin:0;padding:0;box-sizing:border-box}" +
+      "html,body{font-family:'Quicksand',Arial,sans-serif;color:#3E3650;background:#fff;-webkit-print-color-adjust:exact;print-color-adjust:exact}" +
+      screenCSS +
+      ".sheet{" + wrapCSS + ";display:table;background:#fff}" +
+      ".cell{display:table-cell;vertical-align:middle;text-align:center;padding:16mm}" +
+      ".bon{display:inline-block;width:100%;position:relative;border:1.5px solid #C4B0E0;border-radius:4px;padding:20mm 16mm;text-align:center;background:linear-gradient(160deg,#FCFAFE 0%,#F6F2FB 100%)}" +
+      ".bon::before{content:'';position:absolute;top:6px;left:6px;right:6px;bottom:6px;border:0.5px solid #D8CCEA;border-radius:2px;pointer-events:none}" +
+      ".ornament-top{font-family:'Cormorant Garamond',Georgia,serif;font-size:24px;color:#B5A3D4;letter-spacing:8px;margin-bottom:6mm}" +
+      ".maintitle{font-family:'Cormorant Garamond',Georgia,serif;font-size:52px;font-weight:600;font-style:italic;color:#6B5A9E;line-height:1;margin-bottom:4mm;letter-spacing:1px}" +
+      ".divider{width:55%;margin:5mm auto;text-align:center;color:#B5A3D4;font-size:13px}" +
+      ".divider .line-l,.divider .line-r{display:inline-block;width:38%;height:1px;background:#C4B0E0;vertical-align:middle;margin:0 8px}" +
+      ".subtitle{font-family:'Cormorant Garamond',Georgia,serif;font-size:22px;font-style:italic;color:#8B7CB8;margin:0 auto 7mm;max-width:82%;line-height:1.3}" +
+      ".benef{font-family:'Cormorant Garamond',Georgia,serif;font-size:20px;color:#3E3650;margin-bottom:6mm}" +
+      ".benef .nm{font-weight:600;font-style:italic;color:#6B5A9E}" +
+      ".lotus-wrap{margin:4mm 0 7mm;text-align:center}" +
+      ".lotus-wrap img{width:130px;height:auto}" +
+      ".validite{font-size:14px;color:#6B617E;letter-spacing:.5px;margin-bottom:3mm}" +
+      ".validite strong{color:#6B5A9E;font-weight:600}" +
+      ".datelimite{font-size:12px;color:#A99FBC;letter-spacing:.5px;margin-bottom:7mm}" +
+      ".msg-zone{width:80%;margin:0 auto 7mm}" +
+      ".msg-label{font-family:'Cormorant Garamond',Georgia,serif;font-size:15px;font-style:italic;color:#8B7CB8;margin-bottom:3mm}" +
+      ".msg-text{font-size:13px;color:#3E3650;font-style:italic;line-height:1.6}" +
+      ".footer{width:100%;border-top:1px solid #E0D5EE;padding-top:6mm;margin-top:2mm}" +
+      ".footer-logo{font-family:'Cormorant Garamond',Georgia,serif;font-size:18px;font-weight:600;font-style:italic;color:#8B7CB8;margin-bottom:2mm}" +
+      ".footer-info{font-size:11px;color:#A99FBC;line-height:1.7;letter-spacing:.3px}" +
+      ".footer-info .nom{font-weight:600;color:#6B617E;font-size:12px}" +
+      "</style>" +
+      "<div class='sheet'><div class='cell'><div class='bon'>" +
+      "<div class='ornament-top'>&#10070; &#10070; &#10070;</div>" +
+      "<div class='maintitle'>Bon Cadeau</div>" +
+      "<div class='divider'><span class='line-l'></span>&#10086;<span class='line-r'></span></div>" +
+      "<div class='subtitle'>pour une s\u00E9ance de " + soinChoisi + "</div>" +
+      (beneficiaire ? "<div class='benef'>Offert &agrave; <span class='nm'>" + beneficiaire + "</span></div>" : "") +
+      "<div class='lotus-wrap'><img src='" + LOTUS_IMG + "' alt='lotus'></div>" +
+      "<div class='validite'>Valable <strong>" + dureeValidite + " mois</strong> &agrave; partir du <strong>" + dateDebutStr + "</strong></div>" +
+      "<div class='datelimite'>Date limite : " + dateFinStr + "</div>" +
+      (message ? "<div class='msg-zone'><div class='msg-label'>&#10086; Message &#10086;</div><div class='msg-text'>" + message + "</div></div>" : "") +
+      "<div class='footer'>" +
+      "<div class='footer-logo'>R\u00E9flexologie et Th\u00E9rapie Manuelle</div>" +
+      "<div class='footer-info'><span class='nom'>VILLEMOT Georgiana</span><br>" + CAB.address + " &middot; " + CAB.city + "<br>" + CAB.phone + "</div>" +
+      "</div>" +
+      "</div></div></div>";
+  };
+
   var doPrintBon = function () {
-    var h = ["<!DOCTYPE html><html><head><meta charset='utf-8'><title>Bon cadeau</title>", "<link href='https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Quicksand:wght@400;500;600;700&display=swap' rel='stylesheet'>", "<style>", "@page{size:A4;margin:20mm}", "*{margin:0;padding:0;box-sizing:border-box}", "body{font-family:'Quicksand',sans-serif;color:#3E3650;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#fff}", ".bon{width:700px;padding:50px 60px;text-align:center;position:relative;border:2px solid #E8E0F0;border-radius:20px}", ".bon-title{font-family:'Cormorant Garamond',serif;font-size:38px;font-weight:700;color:#6B5A9E;margin-bottom:8px}", ".bon-subtitle{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:500;color:#8B7CB8;font-style:italic;margin-bottom:30px}", ".bon-beneficiaire{font-size:16px;font-weight:600;color:#3E3650;margin-bottom:30px}", ".bon-lotus{margin:30px auto}", ".bon-validite{font-size:14px;color:#6B617E;margin:30px 0 10px}", ".bon-dates{font-size:13px;color:#9D93AE;margin-bottom:30px}", ".bon-message-label{font-size:12px;color:#9D93AE;text-align:left;margin-bottom:6px;font-weight:600}", ".bon-message{font-size:14px;color:#3E3650;font-style:italic;text-align:left;min-height:60px;padding:12px 16px;border:1px solid #E8E0F0;border-radius:10px;margin-bottom:30px}", ".bon-footer{border-top:1px solid #E8E0F0;padding-top:20px;display:flex;align-items:center;justify-content:center;gap:20px}", ".bon-footer-logo{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:600;font-style:italic;color:#8B7CB8}", ".bon-footer-info{font-size:11px;color:#9D93AE;line-height:1.6;text-align:left}", ".corner{position:absolute;width:80px;height:80px;opacity:.12}", ".corner svg{width:100%;height:100%}", ".c-tl{top:10px;left:10px}.c-tr{top:10px;right:10px;transform:scaleX(-1)}.c-bl{bottom:10px;left:10px;transform:scaleY(-1)}.c-br{bottom:10px;right:10px;transform:scale(-1,-1)}", "</style></head><body>", "<div class='bon'>", "<div class='corner c-tl'><svg viewBox='0 0 120 120'><path d='M10,110 Q10,60 40,40 Q60,25 80,30 Q95,34 90,50 Q85,65 70,60' fill='none' stroke='#8B7CB8' stroke-width='2.5'/><path d='M5,95 Q15,80 30,75 Q42,71 48,78 Q52,84 44,88' fill='none' stroke='#C4B0E0' stroke-width='1.8'/></svg></div>", "<div class='corner c-tr'><svg viewBox='0 0 120 120'><path d='M10,110 Q10,60 40,40 Q60,25 80,30 Q95,34 90,50 Q85,65 70,60' fill='none' stroke='#8B7CB8' stroke-width='2.5'/><path d='M5,95 Q15,80 30,75 Q42,71 48,78 Q52,84 44,88' fill='none' stroke='#C4B0E0' stroke-width='1.8'/></svg></div>", "<div class='corner c-bl'><svg viewBox='0 0 120 120'><path d='M10,110 Q10,60 40,40 Q60,25 80,30 Q95,34 90,50 Q85,65 70,60' fill='none' stroke='#8B7CB8' stroke-width='2.5'/><path d='M5,95 Q15,80 30,75 Q42,71 48,78 Q52,84 44,88' fill='none' stroke='#C4B0E0' stroke-width='1.8'/></svg></div>", "<div class='corner c-br'><svg viewBox='0 0 120 120'><path d='M10,110 Q10,60 40,40 Q60,25 80,30 Q95,34 90,50 Q85,65 70,60' fill='none' stroke='#8B7CB8' stroke-width='2.5'/><path d='M5,95 Q15,80 30,75 Q42,71 48,78 Q52,84 44,88' fill='none' stroke='#C4B0E0' stroke-width='1.8'/></svg></div>", "<div class='bon-title'>Bon cadeau</div>", "<div class='bon-subtitle'>pour " + soinChoisi + "</div>", beneficiaire ? "<div class='bon-beneficiaire'>Offert à : " + beneficiaire + "</div>" : "", "<div class='bon-lotus'><svg viewBox='0 0 200 160' width='140' height='112'><ellipse cx='100' cy='110' rx='24' ry='44' fill='#D4A0C0' opacity='.2' transform='rotate(-25 100 110)'/><ellipse cx='100' cy='110' rx='24' ry='44' fill='#D4A0C0' opacity='.2' transform='rotate(25 100 110)'/><ellipse cx='100' cy='104' rx='20' ry='48' fill='#E8B0D0' opacity='.25'/><ellipse cx='76' cy='116' rx='18' ry='36' fill='#D4A0C0' opacity='.15' transform='rotate(-40 76 116)'/><ellipse cx='124' cy='116' rx='18' ry='36' fill='#D4A0C0' opacity='.15' transform='rotate(40 124 116)'/><ellipse cx='100' cy='100' rx='14' ry='36' fill='#E8B0D0' opacity='.35'/><circle cx='100' cy='84' r='8' fill='#D4A843' opacity='.5'/></svg></div>", "<div class='bon-validite'>Valable " + dureeValidite + " mois à partir du <strong>" + dateDebutStr + "</strong></div>", "<div class='bon-dates'>Date limite : " + dateFinStr + "</div>", message ? "<div class='bon-message-label'>Message :</div><div class='bon-message'>" + message + "</div>" : "<div class='bon-message-label'>Message :</div><div class='bon-message'>&nbsp;</div>", "<div class='bon-footer'>", "<svg viewBox='0 0 100 80' width='40' height='32'><ellipse cx='50' cy='55' rx='12' ry='22' fill='#8B7CB8' opacity='.25' transform='rotate(-25 50 55)'/><ellipse cx='50' cy='55' rx='12' ry='22' fill='#8B7CB8' opacity='.25' transform='rotate(25 50 55)'/><ellipse cx='50' cy='52' rx='10' ry='24' fill='#8B7CB8' opacity='.3'/><ellipse cx='50' cy='50' rx='7' ry='18' fill='#8B7CB8' opacity='.45'/><circle cx='50' cy='42' r='4' fill='#D4A843' opacity='.6'/></svg>", "<div><div class='bon-footer-logo'>Réflexologie et Thérapie Manuelle</div><div class='bon-footer-info'>VILLEMOT Georgiana<br>" + CAB.address + "<br>" + CAB.city + "<br>" + CAB.phone + "</div></div>", "</div>", "</div>", "</body></html>"].join("\n");
+    var h = "<!DOCTYPE html><html><head><meta charset='utf-8'><title>Bon cadeau</title>" +
+      "<link href='https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600&family=Quicksand:wght@300;400;500;600&display=swap' rel='stylesheet'>" +
+      "</head><body>" + buildBonHtml(true) + "</body></html>";
     var w = window.open("", "_blank");
     if (w) {
       w.document.write(h);
       w.document.close();
       setTimeout(function () {
         w.print();
-      }, 500);
+      }, 600);
+    } else {
+      // iOS / popup bloque : PDF telechargeable
+      pdfFallback(buildBonHtml(false), "bon-cadeau.pdf");
     }
   };
   var handleFacturer = async function () {
@@ -2957,7 +3052,7 @@ function BonCadeauPage({
     }
   }, /*#__PURE__*/React.createElement("button", {
     className: "btn btn-primary",
-    onClick: function () {
+    onClick: function (ev) {
       if (MAIL_WEBAPP_URL === "VOTRE_WEBAPP_URL") {
         alert("Configuration manquante : l'URL du Web App n'est pas renseignee.");
         return;
@@ -2966,65 +3061,22 @@ function BonCadeauPage({
       if (!to || !to.trim()) return;
       to = to.trim();
 
-      // Construire le HTML du bon cadeau pour PDF
-      var styles = "<style>" +
-        "*{margin:0;padding:0;box-sizing:border-box}" +
-        ".boncpdf{font-family:Georgia,serif;color:#3E3650;background:#fff;width:794px;padding:60px 70px;text-align:center;position:relative}" +
-        ".boncpdf .bon-title{font-size:48px;font-weight:700;color:#6B5A9E;margin-bottom:10px;font-style:italic;letter-spacing:2px}" +
-        ".boncpdf .bon-sub{font-size:22px;color:#8B7CB8;font-style:italic;margin-bottom:36px}" +
-        ".boncpdf .bon-benef{font-size:18px;font-weight:600;color:#3E3650;margin-bottom:34px}" +
-        ".boncpdf .lotus{margin:30px 0}" +
-        ".boncpdf .bon-validite{font-size:16px;color:#6B617E;margin:30px 0 10px}" +
-        ".boncpdf .bon-dates{font-size:14px;color:#9D93AE;margin-bottom:34px}" +
-        ".boncpdf .msg-label{font-size:12px;color:#9D93AE;text-align:left;margin-bottom:8px;font-weight:600;letter-spacing:1px;text-transform:uppercase}" +
-        ".boncpdf .msg-box{font-size:14px;color:#3E3650;font-style:italic;text-align:left;min-height:60px;padding:14px 18px;border:1px solid #E8E0F0;border-radius:10px;margin-bottom:40px}" +
-        ".boncpdf .bon-footer{border-top:1px solid #E8E0F0;padding-top:24px;font-size:12px;color:#6B617E;line-height:1.8}" +
-        ".boncpdf .bon-footer .logo{font-family:Georgia,serif;font-size:18px;font-weight:600;font-style:italic;color:#8B7CB8;margin-bottom:10px}" +
-        "</style>";
+      // Construire le HTML du bon cadeau pour PDF (meme design elegant que l'impression)
+      var bonInner = buildBonHtml(false);
 
-      var lotusSVG = "<svg viewBox='0 0 200 160' width='160' height='128' xmlns='http://www.w3.org/2000/svg'>" +
-        "<ellipse cx='100' cy='110' rx='24' ry='44' fill='#D4A0C0' opacity='0.2' transform='rotate(-25 100 110)'/>" +
-        "<ellipse cx='100' cy='110' rx='24' ry='44' fill='#D4A0C0' opacity='0.2' transform='rotate(25 100 110)'/>" +
-        "<ellipse cx='100' cy='104' rx='20' ry='48' fill='#E8B0D0' opacity='0.25'/>" +
-        "<ellipse cx='76' cy='116' rx='18' ry='36' fill='#D4A0C0' opacity='0.15' transform='rotate(-40 76 116)'/>" +
-        "<ellipse cx='124' cy='116' rx='18' ry='36' fill='#D4A0C0' opacity='0.15' transform='rotate(40 124 116)'/>" +
-        "<ellipse cx='100' cy='100' rx='14' ry='36' fill='#E8B0D0' opacity='0.35'/>" +
-        "<circle cx='100' cy='84' r='8' fill='#D4A843' opacity='0.5'/>" +
-        "</svg>";
-
-      var bodyHtml = "<div class='boncpdf'>" +
-        "<div class='bon-title'>Bon cadeau</div>" +
-        "<div class='bon-sub'>pour " + soinChoisi + "</div>" +
-        (beneficiaire ? "<div class='bon-benef'>Offert a : " + beneficiaire + "</div>" : "") +
-        "<div class='lotus'>" + lotusSVG + "</div>" +
-        "<div class='bon-validite'>Valable " + dureeValidite + " mois a partir du <strong>" + dateDebutStr + "</strong></div>" +
-        "<div class='bon-dates'>Date limite : " + dateFinStr + "</div>" +
-        (message ? "<div class='msg-label'>Message</div><div class='msg-box'>" + message + "</div>" : "") +
-        "<div class='bon-footer'>" +
-        "<div class='logo'>Reflexologie et Therapie Manuelle</div>" +
-        "VILLEMOT Georgiana<br>" +
-        CAB.address + "<br>" + CAB.city + "<br>" +
-        "Tel : " + CAB.phone + "<br>" +
-        "Mail : " + CAB.email +
-        "</div></div>";
-
-      var btn = window.event.target;
+      var btn = ev.currentTarget;
       var originalText = btn.textContent;
       btn.textContent = "Envoi en cours...";
       btn.disabled = true;
 
-      var styleEl = document.createElement("div");
-      styleEl.innerHTML = styles;
-      document.head.appendChild(styleEl.firstElementChild);
-
       var container = document.createElement("div");
-      container.innerHTML = bodyHtml;
+      container.innerHTML = bonInner;
       container.style.position = "absolute";
       container.style.top = "0";
       container.style.left = "0";
       container.style.zIndex = "-99999";
       document.body.appendChild(container);
-      var target = container.firstElementChild;
+      var target = container.querySelector(".sheet");
 
       var opt = {
         margin: 0,
